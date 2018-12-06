@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 任务队列、事件循环与定时器 · jersey's blog</title><meta name="description" content="任务队列、事件循环与定时器 - Jersey"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://yoursite.com/atom.xml" title="jersey's blog"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://weibo.com/u/2012726081" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/leejersey" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">任务队列、事件循环与定时器</h1><div class="post-info">Oct 7, 2018</div><div class="post-content"><h4 id="任务队列"><a href="#任务队列" class="headerlink" title="任务队列"></a>任务队列</h4><p>js是单线程的，因为js可以操作DOM，如果多线程的话，会造成冲突的问题。</p>
+<p>js的任务分为同步任务和异步任务。同步任务是指在主线程上依次执行的任务，形成一个执行栈。而异步任务不在主线程，在任务队列中，如网络请求，定时器等。在执行栈的任务执行完毕之后，系统会检查任务队列，看是否有可以执行的异步任务。-</p>
+<p>而任务队列分为两种，一种是mircotask，另一种是marcotask。按照我的理解，mircotask和marcotask的区别在于mircotask的任务可以在本次循环/页面刷新前被加入到任务队列，而marcotask不可以</p>
+<p>mircotask</p>
+<ul>
+<li>promise</li>
+<li>mutation.oberver</li>
+<li>process.nextTick</li>
+</ul>
+<p>marcotask</p>
+<ul>
+<li>setTimeout,setInterval</li>
+<li>requestAnimationFrame</li>
+<li>解析HTML</li>
+<li>执行主线程js代码</li>
+<li>修改url</li>
+<li>页面加载</li>
+<li>用户交互</li>
+</ul>
+<h4 id="浏览器篇"><a href="#浏览器篇" class="headerlink" title="浏览器篇"></a>浏览器篇</h4><p>浏览器的event loops由HTML标准而不是ECMAScript定义，具体可以查看<a href="/go/?target=https%3A%2F%2Fhtml.spec.whatwg.org%2Fmultipage%2Fwebappapis.html%23event-loop-processing-model">event-loop-processing-model</a>,在这里列出比较关键的步奏</p>
+<ol>
+<li>检查macrotask队列，运行最前面的任务，如果队列为空，前往第二步</li>
+<li>检查mircotask队列，一直运行队列中的任务直到该队列为空</li>
+<li><p>渲染过程</p>
+</li>
+<li><p>执行resize，scroll，媒体查询，动画，全屏等步奏</p>
+</li>
+<li>运行animation frame回调</li>
+<li>运行IntersectionObserver回调</li>
+<li><p>渲染</p>
+</li>
+<li><p>回到第一步</p>
+</li>
+</ol>
+<p>因此，eventloop分为三个阶段，执行一个marcotask，清空mircotask队列，运行render阶段<br>用代码验证一下</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">setTimeout(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'t0'</span>)<span class="built_in">Promise</span>.resolve().then(<span class="function"><span class="params">res</span> =&gt;</span>&#123;</div><div class="line">      <span class="built_in">console</span>.log(<span class="string">'p0'</span>)&#125;)&#125;)</div><div class="line">  <span class="keyword">let</span> i =<span class="number">0</span><span class="keyword">function</span> raf ()&#123;</div><div class="line">    <span class="built_in">console</span>.log(i)</div><div class="line">    <span class="built_in">document</span>.querySelector(<span class="string">'div'</span>).style.width = i *<span class="number">20</span>+<span class="string">'px'</span><span class="built_in">Promise</span>.resolve().then(<span class="function"><span class="params">res</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">'p'</span>+ i))</div><div class="line">    setTimeout(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</div><div class="line">      <span class="built_in">console</span>.log(<span class="string">'t'</span>+ i)<span class="keyword">if</span>(i ===<span class="number">1</span>)&#123;</div><div class="line">        <span class="built_in">document</span>.querySelector(<span class="string">'div'</span>).style.background =<span class="string">'red'</span></div><div class="line">        <span class="built_in">document</span>.querySelector(<span class="string">'div'</span>).style.height =<span class="string">'50px'</span>&#125;<span class="keyword">if</span>(i ===<span class="number">2</span>)&#123;</div><div class="line">        <span class="keyword">let</span> j =<span class="number">0</span><span class="keyword">while</span>(j++<span class="xml"><span class="tag">&lt;<span class="name">1000000000)&#123;&#125;</span></span></span></div><div class="line"><span class="xml">        document.querySelector('div').style.background ='blue'</span></div><div class="line"><span class="xml">        document.querySelector('div').style.height ='300px'&#125;if(i ===3)&#123;</span></div><div class="line"><span class="xml">        document.querySelector('div').style.width ='40px'&#125;Promise.resolve(3).then(res =&gt;&#123;</span></div><div class="line"><span class="xml">        console.log('tp'+ i)&#125;)&#125;)if(++i <span class="tag">&lt;<span class="name">=10)&#123;</span></span></span></div><div class="line"><span class="xml">      requestAnimationFrame(raf)&#125;&#125;</span></div><div class="line"><span class="xml">  requestAnimationFrame(raf)</span></div></pre></td></tr></table></figure>
+<p>输出结果为<code>t0,p0,0,p1,t1,tp1,1,p2,t2,tp2,2,p3,p4,t4,tp4,t4,tp4,4...</code></p>
+<p>使用chrome dev tool的performance查看过程</p>
+<p><img src="https://img.funteas.com/b0b7fdde7d60099e8a4f0a818c038512?imageView2/2/w/800" alt=""></p>
+<p>在Event log选项卡,分析一下过程,可以观察到，代码执行顺序为，timer，animation frame，paint，而timer和animation frame中又会执行属于各自顺序的mircotasks。尽管在i=2的时候会阻塞代码，然而还是会执行ainmtion frame的代码。<br><img src="https://img.funteas.com/d93aaa1eb7a892233111791d3c926c54?imageView2/2/w/800" alt=""></p>
+<h4 id="nodejs篇"><a href="#nodejs篇" class="headerlink" title="nodejs篇"></a>nodejs篇</h4><h5 id="nodejs六阶段"><a href="#nodejs六阶段" class="headerlink" title="nodejs六阶段"></a>nodejs六阶段</h5><p>看这篇文章就够了,<a href="/go/?target=https%3A%2F%2Fnodejs.org%2Fen%2Fdocs%2Fguides%2Fevent-loop-timers-and-nexttick%2F">The Node.js Event Loop, Timers, and process.nextTick()</a></p>
+<p>nodejs的事件循环有六个阶段</p>
+<ul>
+<li>timers: setTimeout,setInterval</li>
+<li>pending callbacks: 上一轮残留的IO回调</li>
+<li>idle，prepare： 内部使用</li>
+<li>poll：接受新的IO事件，处理其他阶段不处理的回调，node在合适的情况会停留在该阶段</li>
+<li>check： setImmediate的回调</li>
+<li>close callbacks： 关闭的回调</li>
+</ul>
+<p>每个阶段有自己的callback队列，清空了队列或被执行的callback达到最大限制，进入下一个阶段，此时会运行process.nextTick</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">setImmediate(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="number">2</span>));</div><div class="line">setTimeout(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="number">1</span>));<span class="built_in">Promise</span>.resolve().then(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="number">4</span>));</div><div class="line">process.nextTick(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="number">3</span>));<span class="function">(<span class="params">(</span>)=&gt;</span> <span class="built_in">console</span>.log(<span class="number">5</span>))();</div></pre></td></tr></table></figure>
+<p>输出5,3,4,1,2</p>
+<h5 id="nodejs定时器"><a href="#nodejs定时器" class="headerlink" title="nodejs定时器"></a>nodejs定时器</h5><p>nodejs有四种定时器，setTimeout和setInterval算是一种类型，另外还有setImmediate和process.nextTick两种类型。他们跟mircotask如promise之间的执行顺序是怎样的呢？</p>
+<p>有点摸不到头绪？写个代码看下结果</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">setTimeout(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'t1'</span>)</div><div class="line">  setTimeout(<span class="function"><span class="params">()</span>=&gt;</span>&#123;<span class="built_in">console</span>.log(<span class="string">'t3'</span>)&#125;)</div><div class="line">  setTimeout(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="string">'t4'</span>))<span class="built_in">Promise</span>.resolve(<span class="number">1</span>).then(<span class="function"><span class="params">res</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">'p3'</span>))</div><div class="line">  setImmediate(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'i2'</span>)</div><div class="line">    setTimeout(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="string">'t6'</span>))</div><div class="line">    process.nextTick(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</div><div class="line">      <span class="built_in">console</span>.log(<span class="string">'n4'</span>)</div><div class="line">      process.nextTick(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">'n5'</span>)&#125;)&#125;)<span class="built_in">Promise</span>.resolve(<span class="number">1</span>).then(<span class="function"><span class="params">res</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">'p4'</span>)).then(<span class="function"><span class="params">res</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">'p5'</span>))&#125;)</div><div class="line">  setImmediate(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'i3'</span>)</div><div class="line">    setImmediate(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="string">'i4'</span>))&#125;)</div><div class="line">  process.nextTick(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="string">'n2'</span>))</div><div class="line">  process.nextTick(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="string">'n3'</span>))&#125;)</div><div class="line">setTimeout(<span class="function"><span class="params">res</span> =&gt;</span>&#123;</div><div class="line">  process.nextTick(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="string">'n4'</span>))</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'t2'</span>)&#125;)<span class="built_in">Promise</span>.resolve(<span class="number">1</span>).then(<span class="function"><span class="params">res</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">'p1'</span>)).then(<span class="function"><span class="params">res</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">'p2'</span>))</div><div class="line">process.nextTick(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="string">'n1'</span>))</div><div class="line">setImmediate(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'i1'</span>)</div><div class="line">  setTimeout(<span class="function"><span class="params">()</span>=&gt;</span> <span class="built_in">console</span>.log(<span class="string">'t5'</span>))&#125;)</div></pre></td></tr></table></figure>
+<p>输出结果是<code>n1,p1,p2,t1,t2,n2,n3,n4,p3,i1,i2,i3,n4,n5,p4,p5,t3,t4,t5,t6,i4</code></p>
+<p>过程如下</p>
+<ol>
+<li>t1,t2进timer队列，p1进入mircotask队列，i1进入setImmediate队列</li>
+<li>运行process.nextTick，输出n1，清空mircotask队列，输出p1，又加入新的promise任务，输出p2</li>
+<li><p>进入timers阶段，清空timer队列</p>
+</li>
+<li><p>运行t1，输出t1，然后t3，t4加入下一轮的timers队列，p3加入mircotask队列，i2，i3加入setImmediate队列，n2，n3加入process.nextTick队列,</p>
+</li>
+<li><p>运行t2，输出t2，n4加入process.nextTick队列</p>
+</li>
+<li><p>切换阶段，清空nextTick队列，输出n2,n3,n4，清空mircotask队列，输出p3</p>
+</li>
+<li><p>进入check阶段</p>
+</li>
+<li><p>运行i1，输出i1，t5加入timers队列</p>
+</li>
+<li>运行i2，输出i2，t6加入timers队列，输出i2，i3，n4加入nextTick，p4加入mircok队列</li>
+<li><p>运行i3，输出i3，i4加入setImmediate队列</p>
+</li>
+<li><p>切换阶段，运行n4，输出n4，添加n5进队列，运行n5，输出n5，清空mircotask，运行p4，p5加入队列，输出p4，p5</p>
+</li>
+<li>timers阶段 运行t3，t4，t5，t6</li>
+<li>check阶段，输出i4</li>
+</ol>
+<p>可以发现，promise和nexttick的任务是添加在本次循环，其他的是添加到下次循环。并且，是按照timers-&gt;nexttick-&gt;mircotask-&gt;check-&gt;nexttick-&gt;mircotask-&gt;timers这样的流程来运行</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2018/10/07/React性能优化：Virtual-Dom原理浅析/" class="prev">PREV</a><a href="/2018/10/07/javascript数组/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://yoursite.com">Jersey</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>
