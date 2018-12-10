@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta name="generator" content="Hexo 3.8.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Array.prototype.slice.call()方法详解 · jersey's blog</title><meta name="description" content="Array.prototype.slice.call()方法详解 - Jersey"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://yoursite.com/atom.xml" title="jersey's blog"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://weibo.com/u/2012726081" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/leejersey" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Array.prototype.slice.call()方法详解</h1><div class="post-info">Dec 10, 2018</div><div class="post-content"><p>1、基本讲解 </p>
+<hr>
+<ul>
+<li>1.在JS里Array是一个类 slice是此类里的一个方法 ，那么使用此方法应该Array.prototype.slice这么去用<br>slice从字面上的意思很容易理解就是截取（当然你不是英肓的话） 这方法如何使用呢?<br><code>arrayObj.slice(start, [end])</code> 很显然是截取数组的一部分。 </li>
+<li>2.我们再看call<br>call([thisObj[,arg1[arg2[[argN]()]]]])<br>thisObj是一个对象的方法<br>arrg1argN是参数<br>那么<code>Array.prototype.slice.call(arguments,1);</code>这句话的意思就是说把调用方法的参数截取出来。<br>如： <pre><code class="javascript"><span class="string">`function test(a,b,c,d) { </span>
+<span class="string">var arg = Array.prototype.slice.call(arguments,1); </span>
+<span class="string">alert(arg); </span>
+<span class="string">} </span>
+<span class="string">test("a","b","c","d"); //b,c,d</span>
+</code></pre>
+`2、疑惑解答 </li>
+</ul>
+<hr>
+<p>先给个例子，这是jqFloat插件里的代码： </p>
+<pre><code class="javascript"><span class="string">`if (element.data('jDefined')) { </span>
+<span class="string">if (options &amp;&amp; typeof options === 'object') { </span>
+<span class="string">methods.update.apply(this, Array.prototype.slice.call(arguments, 1)); </span>
+<span class="string">} </span>
+<span class="string">} else { </span>
+<span class="string">methods.init.apply(this, Array.prototype.slice.call(arguments, 1)); </span>
+<span class="string">}</span>
+</code></pre>
+<p><code>多次用到 Array.prototype.slice.call(arguments, 1)，不就是等于 arguments.slice(1) 吗？像前者那样写具体的好处是什么？这个很多js新手最疑惑的地方。那为什么呢？ 
+因为arguments并不是真正的数组对象，只是与数组类似而已，所以它并没有slice这个方法，而</code>Array.prototype.slice.call(arguments, 1)`可以理解成是让arguments转换成一个数组对象，让arguments具有slice()方法。要是直接写arguments.slice(1)会报错。 </p>
+<pre><code class="javascript"><span class="string">`typeof arguments==="Object" //而不是 "Array"</span>
+</code></pre>
+<p>`3、真正原理 </p>
+<hr>
+<p><code>Array.prototype.slice.call(arguments)</code>能将具有length属性的对象转成数组，除了IE下的节点集合（因为ie下的dom对象是以com对象的形式实现的，js对象与com对象不能进行转换）<br>如： </p>
+<pre><code class="javascript"><span class="string">`var a={length:2,0:'first',1:'second'};//类数组,有length属性，长度为2，第0个是first，第1个是second </span>
+<span class="string">console.log(Array.prototype.slice.call(a,0));// ["first", "second"](),调用数组的slice(0); </span>
+<span class="string">var a={length:2,0:'first',1:'second'}; </span>
+<span class="string">console.log(Array.prototype.slice.call(a,1));//["second"]()，调用数组的slice(1); </span>
+<span class="string">var a={0:'first',1:'second'};//去掉length属性，返回一个空数组 </span>
+<span class="string">console.log(Array.prototype.slice.call(a,0));//[]() </span>
+<span class="string">function test(){ </span>
+<span class="string">console.log(Array.prototype.slice.call(arguments,0));//["a", "b", "c"]()，slice(0) </span>
+<span class="string">console.log(Array.prototype.slice.call(arguments,1));//["b", "c"](),slice(1) </span>
+<span class="string">} </span>
+<span class="string">test("a","b","c");</span>
+</code></pre>
+<p><code>**补充：** 
+将函数的实际参数转换成数组的方法 
+方法一：</code>var args = Array.prototype.slice.call(arguments);<code>方法二：</code>var args = [].slice.call(arguments, 0);`<br>方法三： </p>
+<pre><code class="javascript"><span class="string">`var args = [](); </span>
+<span class="string">for (var i = 1; i \&lt; arguments.length; i++) { </span>
+<span class="string">args.push(arguments[i]()); </span>
+<span class="string">}</span>
+</code></pre>
+<p>`最后，附个转成数组的通用函数 </p>
+<pre><code class="javascript"><span class="string">`var toArray = function(s){ </span>
+<span class="string">try{ </span>
+<span class="string">return Array.prototype.slice.call(s); </span>
+<span class="string">} catch(e){ </span>
+<span class="string">var arr = [](); </span>
+<span class="string">for(var i = 0,len = s.length; i \&lt; len; i++){ </span>
+<span class="string">//arr.push(s[i]()); </span>
+<span class="string">arr[i]() = s[i](); //据说这样比push快 </span>
+<span class="string">} </span>
+<span class="string">return arr; </span>
+<span class="string">} </span>
+<span class="string">}</span>
+</code></pre>
+<p>`</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2018/12/10/Object-prototype-toString-call-方法/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://yoursite.com">Jersey</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>
