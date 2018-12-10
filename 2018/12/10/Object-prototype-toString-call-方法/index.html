@@ -1,0 +1,36 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Object.prototype.toString.call()方法 · jersey's blog</title><meta name="description" content="Object.prototype.toString.call()方法 - Jersey"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://yoursite.com/atom.xml" title="jersey's blog"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://weibo.com/u/2012726081" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/leejersey" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Object.prototype.toString.call()方法</h1><div class="post-info">Dec 10, 2018</div><div class="post-content"><p>使用Object.prototype上的原生toString()方法判断数据类型，使用方法如下：<br><strong>Object.prototype.toString.call(value)</strong> </p>
+<ol>
+<li>判断基本类型： <pre><code class="javascript"><span class="string">`Object.prototype.toString.call(null); //”[object Null]()” </span>
+<span class="string">Object.prototype.toString.call(undefined); //”[object Undefined]()” </span>
+<span class="string">Object.prototype.toString.call(“abc”); //”[object String]()” </span>
+<span class="string">Object.prototype.toString.call(123); //”[object Number]()” </span>
+<span class="string">Object.prototype.toString.call(true); //”[object Boolean]()”</span>
+</code></pre>
+`2. 判断原生引用类型： <pre><code class="javascript"><span class="string">`// 函数类型 </span>
+<span class="string">Function fn(){console.log(“test”);} </span>
+<span class="string">Object.prototype.toString.call[^1];//”[object Function]()” </span>
+<span class="string">// 日期类型 </span>
+<span class="string">var date = new Date(); </span>
+<span class="string">Object.prototype.toString.call(date);//”[object Date]()” </span>
+<span class="string">// 数组类型 </span>
+<span class="string">var arr = [1,2,3](); </span>
+<span class="string">Object.prototype.toString.call(arr);//”[object Array]()” </span>
+<span class="string">// 正则表达式 </span>
+<span class="string">var reg = /[hbc]()at/gi; </span>
+<span class="string">Object.prototype.toString.call(arr);//”[object Array]()” </span>
+<span class="string">// 自定义类型 </span>
+<span class="string">function Person(name, age) { </span>
+<span class="string">this.name = name; </span>
+<span class="string">this.age = age; </span>
+<span class="string">} </span>
+<span class="string">var person = new Person("Rose", 18); </span>
+<span class="string">Object.prototype.toString.call(arr); //”[object Object]()” </span>
+<span class="string">// 很明显这种方法不能准确判断person是Person类的实例，而只能用instanceof 操作符来进行判断，如下所示： </span>
+<span class="string">console.log(person instanceof Person);//输出结果为true</span>
+</code></pre>
+`3. 判断原生JSON对象： <pre><code class="javascript"><span class="string">`var isNativeJSON = window.JSON &amp;&amp; Object.prototype.toString.call(JSON); </span>
+<span class="string">console.log(isNativeJSON);//输出结果为”[object JSON]()”说明JSON是原生的，否则不是；</span>
+</code></pre>
+`注意：Object.prototype.toString()本身是允许被修改的，而我们目前所讨论的关于Object.prototype.toString()这个方法的应用都是假设toString()方法未被修改为前提的。 </li>
+</ol>
+</div></article></div></main><footer><div class="paginator"><a href="/2018/12/07/Airbnb-es5-代码规范/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://yoursite.com">Jersey</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>
