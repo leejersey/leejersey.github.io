@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2018/12/27/Render-Props-%E6%A8%A1%E5%BC%8F/</loc>
+    
+    <lastmod>2018-12-27T02:53:30.209Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2018/12/27/%E4%B8%8D%E8%83%BD%E4%BD%BF%E7%94%A8%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0%E7%9A%84%E5%9C%BA%E6%99%AF/</loc>
+    
+    <lastmod>2018-12-27T02:36:32.215Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2018/12/24/%E7%90%86%E8%A7%A3PureComponent/</loc>
     
     <lastmod>2018-12-24T09:08:30.371Z</lastmod>
@@ -44,14 +58,14 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/2017/10/19/%E7%8E%B0%E4%BB%A3javascript%E5%8F%82%E8%80%83/</loc>
+    <loc>http://yoursite.com/2018/10/07/%E7%9B%98%E7%82%B9-React-16-0-16-5-%E4%B8%BB%E8%A6%81%E6%9B%B4%E6%96%B0%E5%8F%8A%E5%85%B6%E5%BA%94%E7%94%A8/</loc>
     
     <lastmod>2018-12-06T06:47:09.038Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://yoursite.com/2018/10/07/%E7%9B%98%E7%82%B9-React-16-0-16-5-%E4%B8%BB%E8%A6%81%E6%9B%B4%E6%96%B0%E5%8F%8A%E5%85%B6%E5%BA%94%E7%94%A8/</loc>
+    <loc>http://yoursite.com/2017/10/19/%E7%8E%B0%E4%BB%A3javascript%E5%8F%82%E8%80%83/</loc>
     
     <lastmod>2018-12-06T06:47:09.038Z</lastmod>
     
@@ -100,14 +114,14 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/2018/10/07/javascript%E6%95%B0%E7%BB%84/</loc>
+    <loc>http://yoursite.com/2018/10/22/redux%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
     
     <lastmod>2018-12-06T06:47:09.036Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://yoursite.com/2018/11/01/react%E9%AB%98%E9%98%B6%E7%BB%84%E4%BB%B6/</loc>
+    <loc>http://yoursite.com/2018/10/07/javascript%E6%95%B0%E7%BB%84/</loc>
     
     <lastmod>2018-12-06T06:47:09.036Z</lastmod>
     
@@ -121,7 +135,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/2018/10/22/redux%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
+    <loc>http://yoursite.com/2018/11/01/react%E9%AB%98%E9%98%B6%E7%BB%84%E4%BB%B6/</loc>
     
     <lastmod>2018-12-06T06:47:09.036Z</lastmod>
     
@@ -163,6 +177,13 @@
   </url>
   
   <url>
+    <loc>http://yoursite.com/2018/10/07/ES6%E4%B9%8B%E8%B7%AF%E4%B9%8B%E6%A8%A1%E5%9D%97%E8%AF%A6%E8%A7%A3/</loc>
+    
+    <lastmod>2018-12-06T06:47:09.034Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2018/10/08/CSS%E7%BB%8F%E5%85%B8%E5%B8%83%E5%B1%80/</loc>
     
     <lastmod>2018-12-06T06:47:09.034Z</lastmod>
@@ -178,13 +199,6 @@
   
   <url>
     <loc>http://yoursite.com/2018/10/08/CSS%E5%B1%85%E4%B8%AD%E7%9A%84%E6%96%B9%E5%BC%8F/</loc>
-    
-    <lastmod>2018-12-06T06:47:09.034Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2018/10/07/ES6%E4%B9%8B%E8%B7%AF%E4%B9%8B%E6%A8%A1%E5%9D%97%E8%AF%A6%E8%A7%A3/</loc>
     
     <lastmod>2018-12-06T06:47:09.034Z</lastmod>
     
