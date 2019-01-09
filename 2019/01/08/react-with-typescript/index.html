@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta name="generator" content="Hexo 3.8.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> react with typescript · jersey's blog</title><meta name="description" content="react with typescript - Jersey"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://yoursite.com/atom.xml" title="jersey's blog"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://weibo.com/u/2012726081" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/leejersey" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">react with typescript</h1><div class="post-info">Jan 8, 2019</div><div class="post-content"><h2 id="编写第一个-TSX-组件"><a href="#编写第一个-TSX-组件" class="headerlink" title="编写第一个 TSX 组件"></a>编写第一个 TSX 组件</h2><figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> React <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> ReactDOM <span class="keyword">from</span> <span class="string">'react-dom'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> App = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line"> <span class="keyword">return</span> (</span><br><span class="line">  &lt;div&gt;Hello world&lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp"> )</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">ReactDOM.render(&lt;App /</span>&gt;, <span class="built_in">document</span>.getElementById(<span class="string">'root'</span>)</span><br></pre></td></tr></table></figure>
+<p>上述代码运行时会出现以下错误</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Cannot find module &apos;react&apos;</span><br><span class="line">Cannot find module &apos;react-dom&apos;</span><br></pre></td></tr></table></figure>
+<p>错误原因是由于 React 和 React-dom 并不是使用 TS 进行开发的，所以 TS 不知道 React、 React-dom 的类型，以及该模块导出了什么，此时需要引入 .d.ts 的声明文件，比较幸运的是在社区中已经发布了这些常用模块的声明文件 DefinitelyTyped 。</p>
+<h2 id="安装-React、-React-dom-类型定义文件"><a href="#安装-React、-React-dom-类型定义文件" class="headerlink" title="安装 React、 React-dom 类型定义文件"></a>安装 <code>React</code>、 <code>React-dom</code> 类型定义文件</h2><h5 id="使用-yarn-安装"><a href="#使用-yarn-安装" class="headerlink" title="使用 yarn 安装"></a>使用 yarn 安装</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yarn add @types/react</span><br><span class="line">yarn add @types/react-dom</span><br></pre></td></tr></table></figure>
+<h5 id="使用-npm-安装"><a href="#使用-npm-安装" class="headerlink" title="使用 npm 安装"></a>使用 npm 安装</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm i @types/react -s</span><br><span class="line">npm i @types/react-dom -s</span><br></pre></td></tr></table></figure>
+<p>有状态组件开发<br>我们定义一个 App 有状态组件，props、 state 如下。</p>
+<p>Props</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">props</th>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">是否必传</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">color</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">是</td>
+</tr>
+<tr>
+<td style="text-align:left">size</td>
+<td style="text-align:left">string</td>
+<td style="text-align:left">否</td>
+</tr>
+</tbody>
+</table>
+<p>State</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">props</th>
+<th style="text-align:left">类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">count</td>
+<td style="text-align:left">string</td>
+</tr>
+</tbody>
+</table>
+<h2 id="使用-TSX-我们可以这样写"><a href="#使用-TSX-我们可以这样写" class="headerlink" title="使用 TSX 我们可以这样写"></a>使用 TSX 我们可以这样写</h2><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">interface</span> IProps &#123;</span><br><span class="line">  color: <span class="built_in">string</span>,</span><br><span class="line">  size?: <span class="built_in">string</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">interface</span> IState &#123;</span><br><span class="line">  count: <span class="built_in">number</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> App <span class="keyword">extends</span> React.Component&lt;IProps, IState&gt; &#123;</span><br><span class="line">  <span class="keyword">public</span> state = &#123;</span><br><span class="line">    count: <span class="number">1</span>,</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">public</span> render () &#123;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;div&gt;Hello world&lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>TypeScript 可以对 JSX 进行解析，充分利用其本身的静态检查功能，使用泛型进行 Props、 State 的类型定义。定义后在使用 this.state 和 this.props 时可以在编辑器中获得更好的智能提示，并且会对类型进行检查。</p>
+<p>那么 Component 的泛型是如何实现的呢，我们可以参考下 React 的类型定义文件 node_modules/@types/react/index.d.ts。</p>
+<p>在这里可以看到 Component 这个泛型类， P 代表 Props 的类型， S 代表 State 的类型。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> Component&lt;P, S&gt; &#123;</span><br><span class="line"></span><br><span class="line">    readonly props: Readonly&lt;&#123; children?: ReactNode &#125;&gt; &amp; Readonly&lt;P&gt;;</span><br><span class="line"></span><br><span class="line">    state: Readonly&lt;S&gt;;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Component 泛型类在接收到 P ， S 这两个泛型变量后，将只读属性 props 的类型声明为交叉类型 Readonly&lt;{ children?: ReactNode }&gt; &amp; Readonly</p><p>; 使其支持 children 以及我们声明的 color 、 size 。</p>
+<p>通过泛型的类型别名 Readonly 将 props 的所有属性都设置为只读属性。</p>
+<p>Readonly 实现源码 node_modules/typescript/lib/lib.es5.d.ts 。</p>
+<p>由于 props 属性被设置为只读，所以通过 this.props.size = ‘sm’ 进行更新时候 TS 检查器会进行错误提示，Error:(23, 16) TS2540: Cannot assign to ‘size’ because it is a constant or a read-only property</p>
+<h2 id="无状态组件开发"><a href="#无状态组件开发" class="headerlink" title="无状态组件开发"></a>无状态组件开发</h2><p>Props</p>
+<table>
+<thead>
+<tr>
+<th>props</th>
+<th>类型</th>
+<th>是否必传</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>children</td>
+<td>ReactNode</td>
+<td>否</td>
+</tr>
+<tr>
+<td>onClick</td>
+<td>function</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>SFC类型</p>
+<p>在 React 的声明文件中 已经定义了一个 SFC 类型，使用这个类型可以避免我们重复定义 children、 propTypes、 contextTypes、 defaultProps、displayName 的类型。</p>
+<p>使用 <code>SFC</code> 进行无状态组件开发。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; SFC &#125; <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> &#123; MouseEvent &#125; <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">interface</span> IProps &#123;</span><br><span class="line">  onClick (event: MouseEvent&lt;HTMLDivElement&gt;): <span class="built_in">void</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> Button: SFC&lt;IProps&gt; = <span class="function">(<span class="params">&#123;onClick, children&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;div onClick=&#123;onClick&#125;&gt;</span><br><span class="line">      &#123; children &#125;</span><br><span class="line">    &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">  )</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp">export default Button</span></span><br></pre></td></tr></table></figure>
+<h2 id="事件处理"><a href="#事件处理" class="headerlink" title="事件处理"></a>事件处理</h2><p>我们在进行事件注册时经常会在事件处理函数中使用 <code>event</code> 事件对象，例如当使用鼠标事件时我们通过 <code>clientX</code>、<code>clientY</code> 去获取指针的坐标。</p>
+<p>大家可以想到直接把 <code>event</code> 设置为 <code>any</code> 类型，但是这样就失去了我们对代码进行静态检查的意义。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">handleEvent</span> (<span class="params">event: <span class="built_in">any</span></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(event.clientY)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>试想下当我们注册一个 Touch 事件，然后错误的通过事件处理函数中的 event 对象去获取其 clientY 属性的值，在这里我们已经将 event 设置为 any 类型，导致 TypeScript 在编译时并不会提示我们错误， 当我们通过 event.clientY 访问时就有问题了，因为 Touch 事件的 event 对象并没有 clientY 这个属性。</p>
+<p>通过 interface 对 event 对象进行类型声明编写的话又十分浪费时间，幸运的是 React 的声明文件提供了 Event 对象的类型声明。</p>
+<h4 id="Event-事件对象类型"><a href="#Event-事件对象类型" class="headerlink" title="Event 事件对象类型"></a>Event 事件对象类型</h4><p>常用 Event 事件对象类型：</p>
+<p>ClipboardEvent<t =="" element=""> 剪贴板事件对象</t></p>
+<p>DragEvent<t =="" element=""> 拖拽事件对象</t></p>
+<p>ChangeEvent<t =="" element=""> Change 事件对象</t></p>
+<p>KeyboardEvent<t =="" element=""> 键盘事件对象</t></p>
+<p>MouseEvent<t =="" element=""> 鼠标事件对象</t></p>
+<p>TouchEvent<t =="" element=""> 触摸事件对象</t></p>
+<p>WheelEvent<t =="" element=""> 滚轮事件对象</t></p>
+<p>AnimationEvent<t =="" element=""> 动画事件对象</t></p>
+<p>TransitionEvent<t =="" element=""> 过渡事件对象</t></p>
+<h4 id="实例："><a href="#实例：" class="headerlink" title="实例："></a>实例：</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; MouseEvent &#125; <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">interface</span> IProps &#123;</span><br><span class="line"></span><br><span class="line">  onClick (event: MouseEvent&lt;HTMLDivElement&gt;): <span class="built_in">void</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="事件处理函数类型"><a href="#事件处理函数类型" class="headerlink" title="事件处理函数类型"></a>事件处理函数类型</h4><p>当我们定义事件处理函数时有没有更方便定义其函数类型的方式呢？答案是使用 React 声明文件所提供的 EventHandler 类型别名，通过不同事件的 EventHandler 的类型别名来定义事件处理函数的类型。</p>
+<p><code>EventHandler</code> 接收 <code>E</code> ，其代表事件处理函数中 <code>event</code> 对象的类型。</p>
+<p><code>bivarianceHack</code> 为事件处理函数的类型定义，函数接收一个 <code>event</code> 对象，并且其类型为接收到的泛型变量 <code>E</code> 的类型, 返回值为 <code>void</code>。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> IProps &#123;</span><br><span class="line">  onClick : MouseEventHandler&lt;HTMLDivElement&gt;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Promise-类型"><a href="#Promise-类型" class="headerlink" title="Promise 类型"></a>Promise 类型</h2><p>在做异步操作时我们经常使用 async 函数，函数调用时会 return 一个 Promise 对象，可以使用 then 方法添加回调函数。</p>
+<p>Promise<t> 是一个泛型类型，T 泛型变量用于确定使用 then 方法时接收的第一个回调函数（onfulfilled）的参数类型。</t></p>
+<p>实例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">interface IResponse&lt;T&gt; &#123;</span><br><span class="line">  message: string,</span><br><span class="line">  result: T,</span><br><span class="line">  success: boolean,</span><br><span class="line">&#125;</span><br><span class="line">async function getResponse (): Promise&lt;IResponse&lt;number[]&gt;&gt; &#123;</span><br><span class="line">  return &#123;</span><br><span class="line">    message: &apos;获取成功&apos;,</span><br><span class="line">    result: [1, 2, 3],</span><br><span class="line">    success: true,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">getResponse()</span><br><span class="line">  .then(response =&gt; &#123;</span><br><span class="line">    console.log(response.result)</span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
+<p>我们首先声明 IResponse 的泛型接口用于定义 response 的类型，通过 T 泛型变量来确定 result 的类型。</p>
+<p>然后声明了一个 异步函数 getResponse 并且将函数返回值的类型定义为 Promise<iresponse<number[]>&gt; 。</iresponse<number[]></p>
+<p>最后调用 getResponse 方法会返回一个 promise 类型，通过 then 调用，此时 then 方法接收的第一个回调函数的参数 response 的类型为，{ message: string, result: number[], success: boolean} 。</p>
+<h2 id="工具泛型使用技巧"><a href="#工具泛型使用技巧" class="headerlink" title="工具泛型使用技巧"></a>工具泛型使用技巧</h2><h5 id="typeof"><a href="#typeof" class="headerlink" title="typeof"></a>typeof</h5><p>一般我们都是先定义类型，再去赋值使用，但是使用 <code>typeof</code> 我们可以把使用顺序倒过来。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  a: <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">type</span> Options = <span class="keyword">typeof</span> options</span><br></pre></td></tr></table></figure>
+<h5 id="使用字符串字面量类型限制值为固定的字符串参数"><a href="#使用字符串字面量类型限制值为固定的字符串参数" class="headerlink" title="使用字符串字面量类型限制值为固定的字符串参数"></a>使用字符串字面量类型限制值为固定的字符串参数</h5><p>限制 <code>props.color</code> 的值只可以是字符串 <code>red</code>、<code>blue</code>、<code>yellow</code> 。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> IProps &#123;</span><br><span class="line">  color: <span class="string">'red'</span> | <span class="string">'blue'</span> | <span class="string">'yellow'</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="使用数字字面量类型限制值为固定的数值参数"><a href="#使用数字字面量类型限制值为固定的数值参数" class="headerlink" title="使用数字字面量类型限制值为固定的数值参数"></a>使用数字字面量类型限制值为固定的数值参数</h5><p>限制 <code>props.index</code> 的值只可以是数字 <code>0</code>、 <code>1</code>、 <code>2</code> 。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">interface IProps &#123;</span><br><span class="line"> index: 0 | 1 | 2,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="使用-Partial-将所有的-props-属性都变为可选值"><a href="#使用-Partial-将所有的-props-属性都变为可选值" class="headerlink" title="使用 Partial 将所有的 props 属性都变为可选值"></a>使用 <code>Partial</code> 将所有的 <code>props</code> 属性都变为可选值</h5><p>如果 <code>props</code> 所有的属性值都是可选的我们可以借助 <code>Partial</code> 这样实现。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; MouseEvent &#125; <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> React <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">interface</span> IProps &#123;</span><br><span class="line">  color: <span class="string">'red'</span> | <span class="string">'blue'</span> | <span class="string">'yellow'</span>,</span><br><span class="line">  onClick (event: MouseEvent&lt;HTMLDivElement&gt;): <span class="built_in">void</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> Button: SFC&lt;Partial&lt;IProps&gt;&gt; = <span class="function">(<span class="params">&#123;onClick, children, color&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;div onClick=&#123;onClick&#125;&gt;</span><br><span class="line">      &#123; children &#125;</span><br><span class="line">    &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">  )</span></span><br></pre></td></tr></table></figure>
+<h5 id="使用-Required-将所有-props-属性都设为必填项"><a href="#使用-Required-将所有-props-属性都设为必填项" class="headerlink" title="使用 Required 将所有 props 属性都设为必填项"></a>使用 <code>Required</code> 将所有 <code>props</code> 属性都设为必填项</h5><p>持续收集…</p>
+<p>作者：花生毛豆-<br>来源：CSDN<br>原文：<a href="https://blog.csdn.net/s2096828/article/details/83744677" target="_blank" rel="noopener">https://blog.csdn.net/s2096828/article/details/83744677</a> </p>
+</div></article></div></main><footer><div class="paginator"><a href="/2019/01/08/无标题/" class="prev">PREV</a><a href="/2019/01/02/react优化总结/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2019 <a href="http://yoursite.com">Jersey</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>
