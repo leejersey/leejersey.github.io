@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-05-20T02:57:21.673Z</updated>
+  <updated>2020-05-21T01:38:50.386Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>算法基础-查找字符串出现最多的次数</title>
+    <link href="http://yoursite.com/2020/05/21/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80-%E6%9F%A5%E6%89%BE%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%87%BA%E7%8E%B0%E6%9C%80%E5%A4%9A%E7%9A%84%E6%AC%A1%E6%95%B0/"/>
+    <id>http://yoursite.com/2020/05/21/算法基础-查找字符串出现最多的次数/</id>
+    <published>2020-05-21T01:28:00.000Z</published>
+    <updated>2020-05-21T01:38:50.386Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="问题：查找字符串中出现最多的字符和个数"><a href="#问题：查找字符串中出现最多的字符和个数" class="headerlink" title="问题：查找字符串中出现最多的字符和个数"></a>问题：查找字符串中出现最多的字符和个数</h3><p><code>var str = &#39;sdjksfssscfssdd&#39;;</code><br>解决思路：<br>将字符串转化为下面的格式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">* &#123;</span><br><span class="line">*   s : [s,s,s...],</span><br><span class="line">*   d : [d,d,d...],</span><br><span class="line">*   ...</span><br><span class="line">* &#125;</span><br></pre></td></tr></table></figure></p><p>源码地址：<a href="https://codesandbox.io/s/arithmetic-str1-xct05?file=/index.html" target="_blank" rel="noopener">https://codesandbox.io/s/arithmetic-str1-xct05?file=/index.html</a></p><h4 id="解法一：字符串方式"><a href="#解法一：字符串方式" class="headerlink" title="解法一：字符串方式"></a>解法一：字符串方式</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params">str</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> obj = &#123;&#125;;</span><br><span class="line">    <span class="keyword">var</span> num = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">var</span> value = <span class="string">''</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; str.length; i++) &#123;</span><br><span class="line">        <span class="comment">// 如果obj中不存在某个字符属性，就把它添加进去</span></span><br><span class="line">        <span class="keyword">if</span> (!obj[str[i]]) &#123;</span><br><span class="line">            obj[str[i]] = [];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 把值一一填入到obj[a[i]]中</span></span><br><span class="line">        obj[str[i]].push(str[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//console.log(obj);</span></span><br><span class="line">    <span class="comment">// 找出最多项的那个</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> attr <span class="keyword">in</span> obj) &#123;</span><br><span class="line">        <span class="keyword">if</span> (num &lt; obj[attr].length) &#123;</span><br><span class="line">            num = obj[attr].length;</span><br><span class="line">            value = obj[attr][<span class="number">0</span>];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> res = <span class="string">'字符最多的是'</span> + value + <span class="string">'，出现了'</span> + num + <span class="string">'次'</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;)(str);</span><br></pre></td></tr></table></figure><h4 id="解法二：正则"><a href="#解法二：正则" class="headerlink" title="解法二：正则"></a>解法二：正则</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params">str</span>) </span>&#123;</span><br><span class="line">     <span class="keyword">var</span> num = <span class="number">0</span>;</span><br><span class="line">     <span class="keyword">var</span> value = <span class="string">''</span>;</span><br><span class="line">     <span class="comment">// 排序</span></span><br><span class="line">     str = str.split(<span class="string">''</span>).sort().join(<span class="string">''</span>);</span><br><span class="line">     <span class="comment">// 计算</span></span><br><span class="line">     <span class="comment">// \1表示和(\w)相同，这里找出连续相同的字符串</span></span><br><span class="line">     <span class="keyword">var</span> re = <span class="regexp">/(\w)\1*!/g</span>;</span><br><span class="line">     str.replace(re, <span class="function"><span class="keyword">function</span> (<span class="params">$<span class="number">0</span>, $<span class="number">1</span></span>) </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (num &lt; $<span class="number">0.</span>length) &#123;</span><br><span class="line">        num = $<span class="number">0.</span>length;</span><br><span class="line">        value = $<span class="number">1</span>;</span><br><span class="line">     &#125;</span><br><span class="line">     &#125;);</span><br><span class="line">     <span class="keyword">var</span> res = <span class="string">'字符最多的是'</span> + value + <span class="string">'，出现了'</span> + num + <span class="string">'次'</span>;</span><br><span class="line">     <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;)(str);</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;问题：查找字符串中出现最多的字符和个数&quot;&gt;&lt;a href=&quot;#问题：查找字符串中出现最多的字符和个数&quot; class=&quot;headerlink&quot; title=&quot;问题：查找字符串中出现最多的字符和个数&quot;&gt;&lt;/a&gt;问题：查找字符串中出现最多的字符和个数&lt;/h3&gt;&lt;p&gt;&lt;c
+      
+    
+    </summary>
+    
+    
+      <category term="算法" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+  </entry>
   
   <entry>
     <title>理解useReducer</title>
@@ -203,30 +226,6 @@
     
     
       <category term="javascript" scheme="http://yoursite.com/tags/javascript/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>算法基础-查找字符串最多的字符</title>
-    <link href="http://yoursite.com/2020/05/03/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80-%E6%9F%A5%E6%89%BE%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9C%80%E5%A4%9A%E7%9A%84%E5%AD%97%E7%AC%A6/"/>
-    <id>http://yoursite.com/2020/05/03/算法基础-查找字符串最多的字符/</id>
-    <published>2020-05-03T02:01:21.000Z</published>
-    <updated>2020-05-03T02:03:27.244Z</updated>
-    
-    <content type="html"><![CDATA[<p>查找出现最多的字符串的个数</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">let str = &quot;abcabcabcbbccccc&quot;;</span><br><span class="line">let num = 0;</span><br><span class="line">let char = &apos;&apos;;</span><br><span class="line"> </span><br><span class="line"> // 使其按照一定的次序排列</span><br><span class="line">str = str.split(&apos;&apos;).sort().join(&apos;&apos;);</span><br><span class="line">// &quot;aaabbbbbcccccccc&quot;</span><br><span class="line"></span><br><span class="line">// 定义正则表达式</span><br><span class="line">let re = /(\w)\1+/g;</span><br><span class="line">str.replace(re,($0,$1) =&gt; &#123;</span><br><span class="line">    if(num &lt; $0.length)&#123;</span><br><span class="line">        num = $0.length;</span><br><span class="line">        char = $1;        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;查找出现最多的字符串的个数&lt;/p&gt;
-&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;
-      
-    
-    </summary>
-    
-    
-      <category term="算法" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
