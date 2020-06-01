@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2020/06/01/docker%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/</loc>
+    
+    <lastmod>2020-06-01T03:18:24.806Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2020/05/22/%E7%90%86%E8%A7%A3useMemo%E5%92%8CuseCallback/</loc>
     
     <lastmod>2020-05-22T09:01:14.010Z</lastmod>
