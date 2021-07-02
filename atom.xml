@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2021-04-27T06:29:44.162Z</updated>
+  <updated>2021-05-12T02:22:11.578Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>理解useRef</title>
+    <link href="http://yoursite.com/2021/05/12/%E7%90%86%E8%A7%A3useRef/"/>
+    <id>http://yoursite.com/2021/05/12/理解useRef/</id>
+    <published>2021-05-12T01:48:57.000Z</published>
+    <updated>2021-05-12T02:22:11.578Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="什么是-useRef"><a href="#什么是-useRef" class="headerlink" title="什么是 useRef"></a>什么是 useRef</h2><p>首先, 我们要实现一个需求 – 点击 button 的时候 input 设置焦点.</p><p>createRef API</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import React from &quot;react&quot;;</span><br><span class="line">import &quot;./styles.css&quot;;</span><br><span class="line">import &#123; createRef &#125; from &quot;react&quot;;</span><br><span class="line"></span><br><span class="line">export default function App() &#123;</span><br><span class="line">  const inputElement = createRef();</span><br><span class="line">  const focusInput = () =&gt; &#123;</span><br><span class="line">    inputElement.current.focus();</span><br><span class="line">  &#125;;</span><br><span class="line">  return (</span><br><span class="line">    &lt;div className=&quot;App&quot;&gt;</span><br><span class="line">      &lt;input ref=&#123;inputElement&#125; type=&quot;text&quot; /&gt;</span><br><span class="line">      &lt;button onClick=&#123;focusInput&#125;&gt;焦距input&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>同样的, 我们可以使用 useRef 来实现完全相同的结果.</p><p>useRef Hook<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import React from &quot;react&quot;;</span><br><span class="line">import &quot;./styles.css&quot;;</span><br><span class="line">import &#123; useRef &#125; from &quot;react&quot;;</span><br><span class="line"></span><br><span class="line">export default function App() &#123;</span><br><span class="line">  const inputElement = useRef();</span><br><span class="line">  const focusInput = () =&gt; &#123;</span><br><span class="line">    inputElement.current.focus();</span><br><span class="line">  &#125;;</span><br><span class="line">  return (</span><br><span class="line">    &lt;div className=&quot;App&quot;&gt;</span><br><span class="line">      &lt;input ref=&#123;inputElement&#125; type=&quot;text&quot; /&gt;</span><br><span class="line">      &lt;button onClick=&#123;focusInput&#125;&gt;焦距input&lt;/button&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><h2 id="createRef-与-useRef-的区别"><a href="#createRef-与-useRef-的区别" class="headerlink" title="createRef 与 useRef 的区别"></a>createRef 与 useRef 的区别</h2><p>useRef 在 react hook 中的作用, 正如官网说的, 它像一个变量, 类似于 this , 它就像一个盒子, 你可以存放任何东西. createRef 每次渲染都会返回一个新的引用，而 useRef 每次都会返回相同的引用。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; createRef, useRef &#125; from &quot;react&quot;;</span><br><span class="line">import &quot;./styles.css&quot;;</span><br><span class="line"></span><br><span class="line">const App = () =&gt; &#123;</span><br><span class="line">  const [renderIndex, setRenderIndex] = React.useState(1);</span><br><span class="line">  const refFromUseRef = useRef();</span><br><span class="line">  const refFromCreateRef = createRef();</span><br><span class="line"></span><br><span class="line">  if (!refFromUseRef.current) &#123;</span><br><span class="line">    refFromUseRef.current = renderIndex;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  if (!refFromCreateRef.current) &#123;</span><br><span class="line">    refFromCreateRef.current = renderIndex;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  return (</span><br><span class="line">    &lt;&gt;</span><br><span class="line">      &lt;p&gt;Current render index: &#123;renderIndex&#125;&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;</span><br><span class="line">        &lt;b&gt;refFromUseRef&lt;/b&gt; value: &#123;refFromUseRef.current&#125;</span><br><span class="line">      &lt;/p&gt;</span><br><span class="line">      &lt;p&gt;</span><br><span class="line">        &lt;b&gt;refFromCreateRef&lt;/b&gt; value:&#123;refFromCreateRef.current&#125;</span><br><span class="line">      &lt;/p&gt;</span><br><span class="line"></span><br><span class="line">      &lt;button onClick=&#123;() =&gt; setRenderIndex(prev =&gt; prev + 1)&#125;&gt;</span><br><span class="line">        Cause re-render</span><br><span class="line">      &lt;/button&gt;</span><br><span class="line">    &lt;/&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">export default App;</span><br></pre></td></tr></table></figure><p>就算组件重新渲染, 由于 refFromUseRef 的值一直存在(类似于 this ) , 无法重新赋值.</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;什么是-useRef&quot;&gt;&lt;a href=&quot;#什么是-useRef&quot; class=&quot;headerlink&quot; title=&quot;什么是 useRef&quot;&gt;&lt;/a&gt;什么是 useRef&lt;/h2&gt;&lt;p&gt;首先, 我们要实现一个需求 – 点击 button 的时候 input 设置
+      
+    
+    </summary>
+    
+    
+      <category term="react" scheme="http://yoursite.com/tags/react/"/>
+    
+  </entry>
   
   <entry>
     <title>flex学习笔记</title>
@@ -458,29 +481,6 @@
     
     
       <category term="javascript" scheme="http://yoursite.com/tags/javascript/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>算法基础-字符串反转</title>
-    <link href="http://yoursite.com/2020/05/01/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8F%8D%E8%BD%AC/"/>
-    <id>http://yoursite.com/2020/05/01/算法基础-字符串反转/</id>
-    <published>2020-05-01T10:19:18.000Z</published>
-    <updated>2020-05-01T10:41:05.861Z</updated>
-    
-    <content type="html"><![CDATA[<p>方法一：<br>生成一个栈，从尾到头依次取出字符串中的字符压入栈中，然后把栈连接成字符串。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> reverse = <span class="function"><span class="keyword">function</span>(<span class="params"> str </span>)</span>&#123;</span><br><span class="line">   <span class="keyword">var</span> stack = [];<span class="comment">//生成一个栈</span></span><br><span class="line">   <span class="keyword">for</span>(<span class="keyword">var</span> len = str.length,i=len;i&gt;=<span class="number">0</span>;i-- )&#123;</span><br><span class="line">    stack.push(str[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> stack.join(<span class="string">''</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p><p>方法二：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> reverse = <span class="function"><span class="keyword">function</span>(<span class="params"> str </span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> newStr = <span class="string">''</span>, i = str.length;</span><br><span class="line">   <span class="keyword">for</span>(; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        newStr += str.charAt(i);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> newStr;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p><p>方法三：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> reverse = <span class="function"><span class="keyword">function</span>(<span class="params"> str </span>)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> str.split(<span class="string">''</span>).reverse().join(<span class="string">''</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;方法一：&lt;br&gt;生成一个栈，从尾到头依次取出字符串中的字符压入栈中，然后把栈连接成字符串。&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;lin
-      
-    
-    </summary>
-    
-    
-      <category term="算法" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
