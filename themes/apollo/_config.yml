@@ -1,0 +1,20 @@
+menu:
+    Blog: /
+    Archive: /archives/
+    Weibo: https://weibo.com/u/2012726081
+    GitHub: https://github.com/leejersey
+    Rss: /atom.xml
+
+favicon: /favicon.png
+logo: /favicon.png
+
+# Comment
+disqus:
+duoshuo:
+
+# Analytics
+# ga: UA-xxxxxxxx-x
+
+# Copyright Information
+startyear: 2015
+
