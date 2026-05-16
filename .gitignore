@@ -1,7 +1,6 @@
 node_modules/
-public/
-.deploy*/
-.deploy_git/
-db.json
-*.log
+docs/.vitepress/dist/
+docs/.vitepress/cache/
 .DS_Store
+*.pyc
+__pycache__/
