@@ -1,6 +1,8 @@
 # Jersey's Blog
 
-> 基于 VitePress 的个人技术知识库，内容自动同步自 Obsidian 仔库。
+> 基于 VitePress 的个人技术知识库，内容自动同步自 Obsidian 仓库。
+>
+> 🔗 **在线地址**：[https://leejersey.github.io](https://leejersey.github.io)
 
 ## 🏗️ 架构
 
@@ -9,13 +11,14 @@ Obsidian 仓库（只读，不修改）
   │
   │  python sync_docs.py
   │  ① 复制 .md → docs/
-  │  ② [[wikilink]] → 标准链接
-  │  ③ Obsidian callout → VitePress 容器
-  │  ④ 自动生成 sidebar.json
+  │  ② [[wikilink]] → 标准 markdown 相对链接
+  │  ③ Obsidian callout → VitePress 自定义容器
+  │  ④ {{ }} → HTML 实体转义（避免 Vue 解析）
+  │  ⑤ 自动生成 sidebar.json
   ▼
 VitePress 项目（本仓库）
   │
-  │  npm run build
+  │  npm run build（CI 中 NODE_OPTIONS=--max-old-space-size=8192）
   ▼
 GitHub Pages（自动部署）
 ```
@@ -27,7 +30,6 @@ GitHub Pages（自动部署）
 ### 1. 写完笔记后同步 & 预览
 
 ```bash
-# 进入项目目录
 cd ~/Documents/code/leejersey.github.io
 
 # 同步 Obsidian 笔记到 VitePress
@@ -41,7 +43,6 @@ npm run dev
 ### 2. 发布到线上
 
 ```bash
-# 同步 + 提交 + 推送（一键完成）
 python sync_docs.py
 git add -A
 git commit -m "docs: 更新笔记"
@@ -50,13 +51,10 @@ git push
 # GitHub Actions 会自动构建并部署到 GitHub Pages
 ```
 
-### 3. 一键脚本（推荐）
-
-在项目根目录运行：
+### 3. 一键发布（推荐）
 
 ```bash
-# 同步 + 提交 + 推送
-python sync_docs.py && git add -A && git commit -m "docs: sync $(date +%Y-%m-%d)" && git push
+cd ~/Documents/code/leejersey.github.io && python sync_docs.py && git add -A && git commit -m "docs: sync $(date +%Y-%m-%d)" && git push
 ```
 
 ---
@@ -67,15 +65,15 @@ python sync_docs.py && git add -A && git commit -m "docs: sync $(date +%Y-%m-%d)
 leejersey.github.io/
 ├── docs/                          ← VitePress 文档目录
 │   ├── .vitepress/
-│   │   ├── config.mts             ← 主配置（主题、导航、插件）
+│   │   ├── config.mts             ← 主配置（主题、导航、搜索、代码高亮）
 │   │   └── sidebar.json           ← 侧边栏（sync_docs.py 自动生成）
-│   ├── index.md                   ← 首页（Hero + Features 卡片）
+│   ├── index.md                   ← 首页（Hero + 6 个 Features 卡片）
 │   ├── guide.md                   ← 知识库总览（来自 HOME.md）
 │   ├── public/logo.svg            ← 站点 Logo
 │   ├── AI工程化/                  ← 同步的笔记目录
 │   ├── python/
 │   ├── 后端工程/
-│   └── ...（23 个分类）
+│   └── ...（23 个分类，283 篇笔记）
 ├── sync_docs.py                   ← Obsidian → VitePress 同步脚本
 ├── package.json                   ← Node.js 依赖
 ├── .github/workflows/deploy.yml   ← GitHub Actions 自动部署
@@ -100,15 +98,15 @@ EXCLUDE_DIRS = {
 
 ### 修改导航栏
 
-编辑 `docs/.vitepress/config.mts` 的 `nav` 部分。
+编辑 `docs/.vitepress/config.mts` 中的 `nav` 配置。
 
 ### 修改首页
 
-编辑 `docs/index.md` 的 YAML frontmatter。
+编辑 `docs/index.md` 的 YAML frontmatter（hero、features 部分）。
 
 ### 自定义域名
 
-1. 在 `docs/public/` 下创建 `CNAME` 文件，写入域名
+1. 在 `docs/public/` 下创建 `CNAME` 文件，写入你的域名
 2. 在域名 DNS 添加 CNAME 记录指向 `leejersey.github.io`
 3. GitHub 仓库 Settings → Pages → Custom domain 填入域名
 
@@ -118,8 +116,8 @@ EXCLUDE_DIRS = {
 
 | 命令 | 说明 |
 |:---|:---|
-| `python sync_docs.py` | 同步 Obsidian 笔记 |
-| `npm run dev` | 本地开发预览 |
+| `python sync_docs.py` | 同步 Obsidian 笔记到 docs/ |
+| `npm run dev` | 本地开发预览（http://localhost:5173） |
 | `npm run build` | 构建生产版本 |
 | `npm run preview` | 预览构建产物 |
 
@@ -129,10 +127,55 @@ EXCLUDE_DIRS = {
 
 | 功能 | 说明 |
 |:---|:---|
-| 复制 `.md` 文件 | 保持原目录结构 |
-| `[[wikilink]]` 转换 | `[[path/note]]` → `[note](path/note)` |
-| `[[note\|别名]]` 转换 | → `[别名](note)` |
-| Callout 转换 | `> [!TIP]` → `::: tip` |
-| 生成 sidebar | 自动扫描目录生成 `sidebar.json` |
+| 复制 `.md` 文件 | 保持原目录结构，不修改 Obsidian 源文件 |
+| `[[wikilink]]` 转换 | `[[path/note]]` → `[note](相对路径)` |
+| `[[note\|别名]]` 转换 | → `[别名](相对路径)` |
+| Callout 转换 | `> [!TIP]` → `::: tip`（VitePress 自定义容器） |
+| `{{ }}` 转义 | Helm/Jinja2 模板语法 → HTML 实体，避免 Vue 解析报错 |
+| 生成 sidebar | 自动扫描目录结构生成 `sidebar.json`（23 个分组） |
 | 跳过排除目录 | 求职面试、私人笔记等不发布 |
 | 跳过空文件 | 小于 10 字节的文件不同步 |
+
+---
+
+## 🚀 首次部署步骤
+
+> 仅首次需要，后续只需"一键发布"。
+
+### 1. GitHub 仓库设置
+
+- 进入 `Settings → Pages → Build and deployment → Source`
+- 选择 **GitHub Actions**（不是 "Deploy from a branch"）
+
+### 2. 本地环境
+
+```bash
+# 安装 Node.js 依赖
+cd ~/Documents/code/leejersey.github.io
+npm install
+
+# 安装 Python（同步脚本需要，macOS 自带）
+python --version  # 需要 3.10+
+```
+
+### 3. 首次同步 & 推送
+
+```bash
+python sync_docs.py
+git add -A
+git commit -m "docs: init vitepress site"
+git push
+```
+
+GitHub Actions 会自动构建并部署到 `https://leejersey.github.io`。
+
+---
+
+## ⚠️ 已知问题与解决方案
+
+| 问题 | 原因 | 解决方案 |
+|:---|:---|:---|
+| 构建时 `Error parsing JavaScript expression` | Markdown 中有 `{{ }}` 被 Vue 解析 | 同步脚本已自动转义为 HTML 实体 |
+| 构建时 `JavaScript heap out of memory` | 283 篇笔记太多，Node 默认内存不够 | CI 已配置 `NODE_OPTIONS=--max-old-space-size=8192` |
+| 链接 404 | 目标笔记在排除目录中 | 正常现象，不影响使用 |
+| `language 'xxx' is not loaded` 警告 | 代码块标记了不支持的语言 | 仅为警告，不影响构建 |
