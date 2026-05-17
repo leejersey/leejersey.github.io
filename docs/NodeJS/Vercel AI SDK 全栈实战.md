@@ -1287,6 +1287,7 @@ useChat vs useCompletion 的选择：
 
 ### 6.4 自定义消息组件与 Markdown 渲染
 
+::: v-pre
 ```tsx
 // AI 回复通常包含 Markdown（标题、代码块、列表）
 // 用 react-markdown 渲染
@@ -1307,7 +1308,7 @@ function MessageBubble({ message }: { message: Message }) {
   return (
     <div className="ai-bubble">
       <ReactMarkdown
-        components={{
+        components=&#123;&#123;
           // 自定义代码块渲染（语法高亮）
           code({ className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || "");
@@ -1319,7 +1320,7 @@ function MessageBubble({ message }: { message: Message }) {
               <code className={className} {...props}>{children}</code>
             );
           },
-        }}
+        &#125;&#125;
       >
         {message.content}
       </ReactMarkdown>
@@ -1327,6 +1328,7 @@ function MessageBubble({ message }: { message: Message }) {
   );
 }
 ```
+:::
 
 ### 6.5 错误处理、重试与加载状态
 
@@ -1553,6 +1555,7 @@ function renderToolResult(name: string, result: unknown, key: number) {
 
 ### 7.4 实战：动态卡片 + 图表 + 表单
 
+::: v-pre
 ```tsx
 // 实战示例：股票查询 → 渲染交互式图表
 function StockChart({ data }: { data: { symbol: string; prices: number[] } }) {
@@ -1562,7 +1565,7 @@ function StockChart({ data }: { data: { symbol: string; prices: number[] } }) {
       <div className="chart">
         {/* 使用 recharts 或其他图表库渲染 */}
         {data.prices.map((p, i) => (
-          <div key={i} className="bar" style={{ height: `${p / 10}px` }} />
+          <div key={i} className="bar" style=&#123;&#123; height: `${p / 10}px` &#125;&#125; />
         ))}
       </div>
       <div className="actions">
@@ -1591,6 +1594,7 @@ function BookingForm({ data }: { data: { hotel: string; dates: string[] } }) {
   );
 }
 ```
+:::
 
 ```
 Generative UI 的最佳实践：

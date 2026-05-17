@@ -3803,6 +3803,7 @@ class BrowserLifecycle:
 
 **实用的日志查询命令**（生产环境排查问题的高频操作）：
 
+::: v-pre
 ```bash
 # 查看某个任务的完整日志
 docker logs browser-worker-1 2>&1 | jq 'select(.task_id == "t_abc123")'
@@ -3816,8 +3817,9 @@ docker logs browser-worker-1 2>&1 | \
   sort | uniq -c | sort -rn
 
 # 查看某个 Worker 的内存使用趋势
-docker stats --no-stream --format "{{.MemUsage}}" browser-worker-1
+docker stats --no-stream --format "&#123;&#123;.MemUsage&#125;&#125;" browser-worker-1
 ```
+:::
 
 #### 容器化部署：Dockerfile 与资源限制
 

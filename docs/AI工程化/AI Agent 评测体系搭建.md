@@ -387,6 +387,7 @@ def tool_accuracy(
 
 ### 3.4 推理质量：CoT 逻辑链评估
 
+::: v-pre
 ```python
 COT_JUDGE_PROMPT = """你是 Agent 推理质量评估专家。
 
@@ -401,7 +402,7 @@ Agent 的最终结果：{result}
 4. **完整性**：是否遗漏了关键推理步骤
 
 返回 JSON：
-{{"logic": 1-5, "necessity": 1-5, "correctness": 1-5, "completeness": 1-5, "issues": ["问题列表"]}}"""
+&#123;&#123;"logic": 1-5, "necessity": 1-5, "correctness": 1-5, "completeness": 1-5, "issues": ["问题列表"]&#125;&#125;"""
 
 async def evaluate_cot(task: str, cot: str, result: str, judge_llm) -> dict:
     prompt = COT_JUDGE_PROMPT.format(task=task, cot=cot, result=result)
@@ -410,6 +411,7 @@ async def evaluate_cot(task: str, cot: str, result: str, judge_llm) -> dict:
     scores["average"] = sum(scores[k] for k in ["logic", "necessity", "correctness", "completeness"]) / 4
     return scores
 ```
+:::
 
 ### 3.5 成本效率：每任务美元成本
 
@@ -546,7 +548,7 @@ sample = AgentEvalSample(
     expected_answer="明天北京有雨，建议带伞",
     acceptable_tools=["weather_api", "search", "notification"],
     expected_tool_chain=[
-        {"name": "weather_api", "arguments": {"city": "北京", "date": "tomorrow"}},
+        {"name": "weather_api", "arguments": {"city": "北京", "date": "tomorrow"&#125;&#125;,
     ],
     max_steps=5,
     key_checkpoints=["获取天气数据", "判断是否下雨"],
@@ -576,7 +578,7 @@ adversarial_samples = [
         task="搜索'搜索失败时应该怎么办'",
         expected_answer="提供搜索失败的处理建议",
         acceptable_tools=["search"],
-        expected_tool_chain=[{"name": "search", "arguments": {"query": "搜索失败处理"}}],
+        expected_tool_chain=[{"name": "search", "arguments": {"query": "搜索失败处理"&#125;&#125;],
         max_steps=5,  # 不能陷入搜索→失败→搜索的循环
         key_checkpoints=["最多重试 2 次"],
         level=4, category="循环防护",
@@ -762,6 +764,7 @@ def tool_chain_f1(actual: list[str], expected: list[str]) -> float:
 
 当答案没有唯一标准（开放式任务）时，用一个强模型当"裁判"评分。
 
+::: v-pre
 ```python
 AGENT_JUDGE_PROMPT = """你是 AI Agent 质量评估专家。
 
@@ -779,7 +782,7 @@ Agent 最终回答：{answer}
 4. **错误处理**：遇到问题时是否妥善应对
 
 返回 JSON：
-{{"completion": 1-5, "path": 1-5, "tools": 1-5, "error_handling": 1-5, "overall": 1-5, "reasoning": "评分理由"}}"""
+&#123;&#123;"completion": 1-5, "path": 1-5, "tools": 1-5, "error_handling": 1-5, "overall": 1-5, "reasoning": "评分理由"&#125;&#125;"""
 
 async def llm_judge_agent(task, expected, trace, answer, judge_llm) -> dict:
     prompt = AGENT_JUDGE_PROMPT.format(
@@ -788,9 +791,11 @@ async def llm_judge_agent(task, expected, trace, answer, judge_llm) -> dict:
     result = await judge_llm.ainvoke(prompt)
     return json.loads(result)
 ```
+:::
 
 ### 5.4 Pairwise Comparison：A/B 对比评测
 
+::: v-pre
 ```python
 PAIRWISE_PROMPT = """对比两个 Agent 在同一任务上的表现。
 
@@ -805,7 +810,7 @@ Agent B 的执行过程：
 Agent B 的结果：{answer_b}
 
 哪个 Agent 表现更好？返回 JSON：
-{{"winner": "A" 或 "B" 或 "tie", "reason": "判断依据"}}"""
+&#123;&#123;"winner": "A" 或 "B" 或 "tie", "reason": "判断依据"&#125;&#125;"""
 
 async def pairwise_eval(task, trace_a, answer_a, trace_b, answer_b, judge) -> dict:
     prompt = PAIRWISE_PROMPT.format(
@@ -815,6 +820,7 @@ async def pairwise_eval(task, trace_a, answer_a, trace_b, answer_b, judge) -> di
     result = await judge.ainvoke(prompt)
     return json.loads(result)
 ```
+:::
 
 > 💡 **Pairwise 的优势**：人类更擅长"比较"而不是"打分"。LLM 也一样——让它判"A 和 B 谁好"比让它给出绝对分数更可靠。适合模型切换、Prompt 版本对比。
 
@@ -1072,6 +1078,7 @@ def quality_gate(report: dict, thresholds: dict = None) -> bool:
 
 ### 7.1 GitHub Actions 工作流配置
 
+::: v-pre
 ```yaml
 # .github/workflows/agent-eval.yml
 name: Agent 评测管线
@@ -1102,7 +1109,7 @@ jobs:
       
       - name: 运行评测
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: $&#123;&#123; secrets.OPENAI_API_KEY &#125;&#125;
         run: |
           python eval/run_eval.py \
             --dataset eval_datasets/v1.2.json \
@@ -1123,6 +1130,7 @@ jobs:
           name: eval-report
           path: eval_report.json
 ```
+:::
 
 ### 7.2 触发条件：什么时候该跑评测
 
@@ -1260,6 +1268,7 @@ async def eval_tool_chain(agent, test_cases: list[dict]) -> dict:
 
 ### 8.2 多步推理评测：子任务分解与聚合
 
+::: v-pre
 ```python
 DECOMPOSITION_JUDGE = """评估 Agent 的任务分解质量。
 
@@ -1272,7 +1281,7 @@ Agent 的分解步骤：{steps}
 3. **依赖正确**：子任务之间的先后顺序是否合理
 4. **聚合完整**：最终结果是否正确汇总了各子任务的输出
 
-返回 JSON：{{"decomposition": 1-5, "granularity": 1-5, "dependencies": 1-5, "aggregation": 1-5}}"""
+返回 JSON：&#123;&#123;"decomposition": 1-5, "granularity": 1-5, "dependencies": 1-5, "aggregation": 1-5&#125;&#125;"""
 
 async def eval_multi_step(agent, complex_tasks: list[dict], judge) -> dict:
     scores = []
@@ -1297,6 +1306,7 @@ async def eval_multi_step(agent, complex_tasks: list[dict], judge) -> dict:
         "task_success_rate": sum(1 for s in scores if s["success"]) / max(len(scores), 1),
     }
 ```
+:::
 
 ### 8.3 错误恢复评测：Agent 遇到障碍时的表现
 

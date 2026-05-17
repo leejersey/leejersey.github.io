@@ -1053,6 +1053,7 @@ trivy image my-app:v1             # Trivy（开源工具，推荐）
 
 日常最常用的命令：
 
+::: v-pre
 ```bash
 # ── 创建并启动容器（最常用） ──
 docker run -d --name my-app -p 8000:8000 my-app:v1
@@ -1064,7 +1065,7 @@ docker run -d --name my-app -p 8000:8000 my-app:v1
 docker ps                  # 运行中的容器
 docker ps -a               # 所有容器（含已停止的）
 docker ps -q               # 只输出容器 ID（方便脚本）
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+docker ps --format "table &#123;&#123;.Names&#125;&#125;\t&#123;&#123;.Status&#125;&#125;\t&#123;&#123;.Ports&#125;&#125;"
 # → 自定义输出格式
 
 # ── 生命周期操作 ──
@@ -1082,6 +1083,7 @@ docker stop $(docker ps -q)        # 停止所有运行中的容器
 docker rm $(docker ps -aq)         # 删除所有容器
 docker container prune             # 清理所有已停止的容器
 ```
+:::
 
 > 💡 **`docker run` 每次都会创建一个新容器**。如果只是想重启之前的容器，用 `docker start my-app`，而不是再 `docker run` 一次（那样会产生第二个容器）。
 
@@ -1169,14 +1171,15 @@ docker exec -it my-app python          # 在容器内启动 Python 交互
 # exec 只对运行中的容器有效！已停止的容器用不了
 ```
 
+::: v-pre
 ```bash
 # ── 3. inspect：查看容器的完整配置信息 ──
 docker inspect my-app                  # 输出完整的 JSON 信息（超长）
 
 # 用 --format 提取需要的字段
-docker inspect --format '{{.State.Status}}' my-app        # 容器状态
-docker inspect --format '{{.NetworkSettings.IPAddress}}' my-app  # 容器 IP
-docker inspect --format '{{json .Mounts}}' my-app         # 挂载的卷
+docker inspect --format '&#123;&#123;.State.Status&#125;&#125;' my-app        # 容器状态
+docker inspect --format '&#123;&#123;.NetworkSettings.IPAddress&#125;&#125;' my-app  # 容器 IP
+docker inspect --format '&#123;&#123;json .Mounts&#125;&#125;' my-app         # 挂载的卷
 
 # ── 4. stats：实时资源监控 ──
 docker stats                    # 所有容器的 CPU/内存/网络 实时数据
@@ -1184,6 +1187,7 @@ docker stats my-app             # 只看一个容器
 # CONTAINER   CPU %   MEM USAGE / LIMIT   NET I/O
 # my-app      0.5%    128MiB / 4GiB       1.2MB / 500KB
 ```
+:::
 
 ```
 容器排错流程：
@@ -1658,6 +1662,7 @@ conn.close()
 
 容器间网络不通时，按这个清单排查：
 
+::: v-pre
 ```bash
 # ── 排查工具箱 ──
 
@@ -1670,12 +1675,13 @@ docker exec web ping db               # 能 ping 通吗？
 docker exec web curl http://api:8000/health  # 能访问服务吗？
 
 # 3. 查看容器 IP
-docker inspect --format '{{.NetworkSettings.Networks}}' web
+docker inspect --format '&#123;&#123;.NetworkSettings.Networks&#125;&#125;' web
 
 # 4. 查看端口监听
 docker exec web netstat -tlnp         # 容器内在监听哪些端口
 docker exec web ss -tlnp              # 同上（netstat 不可用时）
 ```
+:::
 
 **常见问题与解决方案**：
 
@@ -2508,6 +2514,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 ### 11.3 GitHub Actions 自动化：测试→构建→部署
 
+::: v-pre
 ```yaml
 # .github/workflows/deploy.yml
 name: Build and Deploy
@@ -2528,8 +2535,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: registry.cn-hangzhou.aliyuncs.com
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+          username: $&#123;&#123; secrets.REGISTRY_USERNAME &#125;&#125;
+          password: $&#123;&#123; secrets.REGISTRY_PASSWORD &#125;&#125;
 
       # 3. 构建并推送镜像
       - name: Build and Push
@@ -2538,20 +2545,21 @@ jobs:
           context: .
           file: Dockerfile.prod
           push: true
-          tags: registry.cn-hangzhou.aliyuncs.com/myns/my-app:${{ github.sha }}
+          tags: registry.cn-hangzhou.aliyuncs.com/myns/my-app:$&#123;&#123; github.sha &#125;&#125;
 
       # 4. 部署到服务器
       - name: Deploy to Server
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: $&#123;&#123; secrets.SERVER_HOST &#125;&#125;
+          username: $&#123;&#123; secrets.SERVER_USER &#125;&#125;
+          key: $&#123;&#123; secrets.SSH_PRIVATE_KEY &#125;&#125;
           script: |
             cd ~/myapp
-            docker pull registry.cn-hangzhou.aliyuncs.com/myns/my-app:${{ github.sha }}
+            docker pull registry.cn-hangzhou.aliyuncs.com/myns/my-app:$&#123;&#123; github.sha &#125;&#125;
             docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
+:::
 
 ```
 CI/CD 自动化流程：

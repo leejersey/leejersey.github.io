@@ -1261,15 +1261,17 @@ docker run -p 3000:3000 \
 # }
 ```
 
+::: v-pre
 ```bash
 # CI 中启用 Remote Cache（GitHub Actions 示例）
 # 在 workflow 中设置环境变量
 env:
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TOKEN: $&#123;&#123; secrets.TURBO_TOKEN &#125;&#125;
   TURBO_TEAM: your-team-name
 
 # turbo 会自动检测这些环境变量并启用 Remote Cache
 ```
+:::
 
 ### 5.4 缓存命中率优化技巧
 
@@ -2277,6 +2279,7 @@ Monorepo CI 的核心问题：
 
 ### 9.2 GitHub Actions Workflow 配置
 
+::: v-pre
 ```yaml
 # .github/workflows/ci.yml —— PR 检查 Workflow
 name: CI
@@ -2289,12 +2292,12 @@ on:
 
 # 同一 PR 的新 push 自动取消旧的 CI 运行
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: $&#123;&#123; github.workflow &#125;&#125;-$&#123;&#123; github.ref &#125;&#125;
   cancel-in-progress: true
 
 env:
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}     # Remote Cache 认证
-  TURBO_TEAM: ${{ vars.TURBO_TEAM }}          # Remote Cache 团队
+  TURBO_TOKEN: $&#123;&#123; secrets.TURBO_TOKEN &#125;&#125;     # Remote Cache 认证
+  TURBO_TEAM: $&#123;&#123; vars.TURBO_TEAM &#125;&#125;          # Remote Cache 团队
 
 jobs:
   ci:
@@ -2321,6 +2324,7 @@ jobs:
       # ⑤ 运行所有检查（Turborepo 自动并行 + 缓存）
       - run: pnpm turbo run lint type-check test build
 ```
+:::
 
 ### 9.3 CI 中的缓存加速：pnpm store + Turborepo Remote Cache
 
@@ -2365,11 +2369,12 @@ turbo run build --filter='...[origin/main]'
 turbo run build test --filter='...[origin/main]...'
 ```
 
+::: v-pre
 ```yaml
 # 在 GitHub Actions 中使用增量构建
 - name: Build affected packages
   run: |
-    if [ "${{ github.event_name }}" = "pull_request" ]; then
+    if [ "$&#123;&#123; github.event_name &#125;&#125;" = "pull_request" ]; then
       # PR：只构建相对于 main 分支变化的包
       pnpm turbo run build test --filter='...[origin/main]'
     else
@@ -2377,6 +2382,7 @@ turbo run build test --filter='...[origin/main]...'
       pnpm turbo run build test
     fi
 ```
+:::
 
 ```
 --filter 与 Turborepo 缓存的配合：
@@ -2400,6 +2406,7 @@ turbo run build test --filter='...[origin/main]...'
 
 ### 9.5 完整 Pipeline：Lint → Test → Build → Publish
 
+::: v-pre
 ```yaml
 # .github/workflows/release.yml —— 发布 Workflow（main 分支触发）
 name: Release
@@ -2409,8 +2416,8 @@ on:
     branches: [main]
 
 env:
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  TURBO_TOKEN: $&#123;&#123; secrets.TURBO_TOKEN &#125;&#125;
+  TURBO_TEAM: $&#123;&#123; vars.TURBO_TEAM &#125;&#125;
 
 jobs:
   release:
@@ -2440,9 +2447,10 @@ jobs:
           commit: "chore: version packages"
           title: "chore: version packages"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: $&#123;&#123; secrets.GITHUB_TOKEN &#125;&#125;
+          NPM_TOKEN: $&#123;&#123; secrets.NPM_TOKEN &#125;&#125;
 ```
+:::
 
 ```
 完整 CI/CD 流程图：

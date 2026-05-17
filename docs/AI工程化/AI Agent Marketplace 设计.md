@@ -473,12 +473,13 @@ async def search_agents(q: str, category: str = None, limit: int = 10):
 
 ### 4.3 能力匹配：根据任务自动推荐 Agent
 
+::: v-pre
 ```python
 RECOMMEND_PROMPT = """分析以下用户任务，提取关键能力需求：
 
 任务：{task}
 
-返回 JSON：{{"required_capabilities": ["能力1", "能力2"], "category": "分类"}}"""
+返回 JSON：&#123;&#123;"required_capabilities": ["能力1", "能力2"], "category": "分类"&#125;&#125;"""
 
 async def recommend_agent(task: str, llm, top_k: int = 5) -> list[dict]:
     """LLM 分析任务 → 提取能力需求 → 匹配 Agent"""
@@ -495,6 +496,7 @@ async def recommend_agent(task: str, llm, top_k: int = 5) -> list[dict]:
     
     return agents
 ```
+:::
 
 ### 4.4 版本管理：语义化版本与灰度发布
 

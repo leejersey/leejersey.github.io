@@ -804,7 +804,7 @@ checkpointer = MemorySaver()  # 生产环境用 PostgresSaver
 app = graph.compile(checkpointer=checkpointer)
 
 # 8. 使用：同一个 thread_id 的对话自动恢复状态
-config = {"configurable": {"thread_id": "user-zhangsan-001"}}
+config = {"configurable": {"thread_id": "user-zhangsan-001"&#125;&#125;
 
 result = await app.ainvoke(
     {"messages": [HumanMessage(content="我叫张三，做电商后端")]},
@@ -2223,6 +2223,7 @@ async def archive_old_sessions(
 
 去重的核心思路：**用向量相似度发现候选重复对，再用 LLM 判断是否合并**。
 
+::: v-pre
 ```python
 async def deduplicate_memories(
     db: AsyncSession,
@@ -2287,13 +2288,14 @@ async def _should_merge(client: AsyncOpenAI, pair) -> dict:
 相似度：{pair.similarity:.2f}
 
 请回答 JSON 格式：
-{{"action": "merge" 或 "keep_both", "merged_value": "合并后的值"}}""",
+&#123;&#123;"action": "merge" 或 "keep_both", "merged_value": "合并后的值"&#125;&#125;""",
         }],
         temperature=0,
     )
     import json
     return json.loads(response.choices[0].message.content)
 ```
+:::
 
 去重的执行策略：
 
@@ -2438,6 +2440,7 @@ async def cleanup_stale_memories(
 
 核心实现：
 
+::: v-pre
 ```python
 REFLECTION_PROMPT = """你是一个记忆管理助手。请审视以下用户的记忆库，
 完成三个任务：
@@ -2450,17 +2453,17 @@ REFLECTION_PROMPT = """你是一个记忆管理助手。请审视以下用户的
 {memories}
 
 请以 JSON 格式输出：
-{{
+&#123;&#123;
   "contradictions": [
-    {{"memory_ids": [1, 3], "description": "矛盾描述", 
-     "resolution": "建议保留哪条"}}
+    &#123;&#123;"memory_ids": [1, 3], "description": "矛盾描述", 
+     "resolution": "建议保留哪条"&#125;&#125;
   ],
   "insights": [
-    {{"derived_from": [2, 4, 5], "insight": "归纳出的新知识",
-     "category": "分类"}}
+    &#123;&#123;"derived_from": [2, 4, 5], "insight": "归纳出的新知识",
+     "category": "分类"&#125;&#125;
   ],
   "cleanup_ids": [6, 7]
-}}"""
+&#125;&#125;"""
 
 async def run_reflection(
     db: AsyncSession,
@@ -2540,6 +2543,7 @@ async def run_reflection(
     
     await db.commit()
 ```
+:::
 
 反思循环的执行频率建议：
 
@@ -3637,6 +3641,7 @@ def evaluate_memory_system(
 
 如何用这些基准来评测自己的记忆系统：
 
+::: v-pre
 ```python
 # 用 LoCoMo 思路构建评测 Pipeline（简化版）
 
@@ -3685,13 +3690,14 @@ async def judge_answer(
 实际回答：{actual}
 
 请以 JSON 格式回答：
-{{"correct": true/false, "score": 0-1, "reason": "判断理由"}}""",
+&#123;&#123;"correct": true/false, "score": 0-1, "reason": "判断理由"&#125;&#125;""",
         }],
         temperature=0,
         response_format={"type": "json_object"},
     )
     return json.loads(response.choices[0].message.content)
 ```
+:::
 
 两个基准在不同维度上的侧重对比：
 

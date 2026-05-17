@@ -589,6 +589,7 @@ faster-whisper 关键参数说明：
 
 如果你在 Mac（M1/M2/M3）上开发，没有 NVIDIA GPU，`mlx-whisper` 是最好的替代——利用 Apple 的 MLX 框架在 Metal GPU 上加速推理：
 
+::: v-pre
 ```python
 """Apple Silicon Mac：mlx-whisper 本地转录"""
 import asyncio
@@ -625,11 +626,11 @@ for seg in output.get("segments", []):
     text = seg.get("text", "").strip()
     if not text:
         continue
-    segments.append({{
+    segments.append(&#123;&#123;
         "start": seg.get("start", 0.0),
         "end": seg.get("end", 0.0),
         "text": text,
-    }})
+    &#125;&#125;)
 
 with open("{output_file}", "w") as f:
     json.dump(segments, f, ensure_ascii=False)
@@ -651,6 +652,7 @@ with open("{output_file}", "w") as f:
         
         return result
 ```
+:::
 
 ```
 为什么 MLX Whisper 要用子进程？
@@ -1049,6 +1051,7 @@ class ClipAnalyzer:
 
 Prompt 设计是这一层最关键的环节。一个好的 Prompt 需要做到四件事：定义角色、给出标准、约束格式、提供示例。
 
+::: v-pre
 ```python
 CLIP_ANALYSIS_PROMPT = """你是一个直播切片剪辑专家。分析以下直播转录文本，\
 找出适合制作短视频切片的精彩片段。
@@ -1072,7 +1075,7 @@ CLIP_ANALYSIS_PROMPT = """你是一个直播切片剪辑专家。分析以下直
 ## 输出格式
 请严格输出 JSON 数组，不要包含其他文本：
 [
-  {{
+  &#123;&#123;
     "clip_id": 1,
     "title": "切片标题（吸引眼球）",
     "start_time": 750.0,
@@ -1082,9 +1085,10 @@ CLIP_ANALYSIS_PROMPT = """你是一个直播切片剪辑专家。分析以下直
     "summary": "内容概要",
     "virality_score": 8,
     "suggested_caption": "推荐的发布文案"
-  }}
+  &#125;&#125;
 ]"""
 ```
+:::
 
 ```
 Prompt 设计的四层结构：

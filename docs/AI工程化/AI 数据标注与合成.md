@@ -227,6 +227,7 @@ def compute_iaa(annotator1: list, annotator2: list) -> dict:
 
 用 GPT-4o 等大模型**直接做标注**——在很多任务上已经能达到甚至超过普通标注员的水平：
 
+::: v-pre
 ```python
 async def llm_annotate(texts: list[str], schema: dict) -> list[dict]:
     """LLM 批量标注"""
@@ -236,7 +237,7 @@ async def llm_annotate(texts: list[str], schema: dict) -> list[dict]:
     标签定义：{json.dumps(schema["labels"], ensure_ascii=False)}
     歧义规则：{schema["ambiguity_rule"]}
     
-    对每条文本输出 JSON：{{"text": "原文", "label": "标签", "confidence": 0.0-1.0}}
+    对每条文本输出 JSON：&#123;&#123;"text": "原文", "label": "标签", "confidence": 0.0-1.0&#125;&#125;
     """
     
     results = []
@@ -253,6 +254,7 @@ async def llm_annotate(texts: list[str], schema: dict) -> list[dict]:
     
     return results
 ```
+:::
 
 ### 3.2 预标注 + 人工修正：效率提升 3-5 倍
 
@@ -403,6 +405,7 @@ def evaluate_llm_annotations(llm_labels: list, human_labels: list) -> dict:
 
 Self-Instruct 是 Stanford Alpaca 使用的方法——**用少量种子任务引导 LLM 生成大量新任务**：
 
+::: v-pre
 ```python
 async def self_instruct(seed_tasks: list[dict], n: int = 1000) -> list[dict]:
     """Self-Instruct：从种子任务扩展生成"""
@@ -421,7 +424,7 @@ async def self_instruct(seed_tasks: list[dict], n: int = 1000) -> list[dict]:
         2. 难度从简单到复杂
         3. 不要重复已有任务
         
-        输出 JSON 数组：[{{"instruction": "...", "input": "...", "output": "..."}}]
+        输出 JSON 数组：[&#123;&#123;"instruction": "...", "input": "...", "output": "..."&#125;&#125;]
         """
         
         response = await client.chat.completions.create(
@@ -434,6 +437,7 @@ async def self_instruct(seed_tasks: list[dict], n: int = 1000) -> list[dict]:
     
     return generated
 ```
+:::
 
 ### 4.3 Evol-Instruct：进化式指令增强
 
@@ -473,6 +477,7 @@ async def evolve_instruction(instruction: str, strategy: str) -> str:
 
 最适合 RAG 和垂直领域的方法——**从你自己的文档中生成 QA 对**：
 
+::: v-pre
 ```python
 async def generate_qa_from_document(document: str, n_pairs: int = 20) -> list[dict]:
     """从文档生成 QA 对"""
@@ -489,8 +494,8 @@ async def generate_qa_from_document(document: str, n_pairs: int = 20) -> list[di
     4. 包含一些文档中找不到答案的问题（标记为 "unanswerable"）
     
     输出 JSON：
-    [{{"question": "...", "answer": "...", "difficulty": "easy|medium|hard", 
-       "evidence": "文档中的依据句"}}]
+    [&#123;&#123;"question": "...", "answer": "...", "difficulty": "easy|medium|hard", 
+       "evidence": "文档中的依据句"&#125;&#125;]
     """
     
     response = await client.chat.completions.create(
@@ -500,9 +505,11 @@ async def generate_qa_from_document(document: str, n_pairs: int = 20) -> list[di
     )
     return json.loads(response.choices[0].message.content)
 ```
+:::
 
 ### 4.5 对话数据合成：多轮对话的自动生成
 
+::: v-pre
 ```python
 async def generate_conversation(scenario: str, turns: int = 5) -> list[dict]:
     """合成多轮对话"""
@@ -518,7 +525,7 @@ async def generate_conversation(scenario: str, turns: int = 5) -> list[dict]:
     4. 包含追问、澄清、确认等自然对话元素
     
     输出格式：
-    [{{"role": "user", "content": "..."}}, {{"role": "assistant", "content": "..."}}]
+    [&#123;&#123;"role": "user", "content": "..."&#125;&#125;, &#123;&#123;"role": "assistant", "content": "..."&#125;&#125;]
     """
     
     response = await client.chat.completions.create(
@@ -531,6 +538,7 @@ async def generate_conversation(scenario: str, turns: int = 5) -> list[dict]:
 scenarios = ["退货退款流程", "商品质量投诉", "物流延迟查询", "会员权益咨询"]
 conversations = [await generate_conversation(s) for s in scenarios]
 ```
+:::
 
 > 💡 **合成数据的最大风险是"模型幻觉"**——LLM 可能生成看起来合理但事实错误的数据。解决方案：对生成的 QA 对做事实一致性检查，或让另一个 LLM 验证答案是否与原文档一致。
 
@@ -1043,6 +1051,7 @@ Phase 1 产出：
 
 用 200 条种子数据引导 LLM 批量生成，然后**按置信度分层审核**：
 
+::: v-pre
 ```python
 import asyncio
 import json
@@ -1077,10 +1086,10 @@ async def llm_expand_dataset(
             4. 包含追问、澄清等自然对话元素
             
             输出 JSON 数组，每条格式：
-            {{"intent": "{intent}", "conversations": [
-                {{"from": "human", "value": "..."}},
-                {{"from": "gpt", "value": "..."}}
-            ], "confidence": 0.0-1.0}}
+            &#123;&#123;"intent": "{intent}", "conversations": [
+                &#123;&#123;"from": "human", "value": "..."&#125;&#125;,
+                &#123;&#123;"from": "gpt", "value": "..."&#125;&#125;
+            ], "confidence": 0.0-1.0&#125;&#125;
             """
             
             response = await client.chat.completions.create(
@@ -1093,6 +1102,7 @@ async def llm_expand_dataset(
     
     return expanded
 ```
+:::
 
 **按置信度分层处理**——不是所有 LLM 生成的数据都同等对待：
 

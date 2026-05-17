@@ -251,6 +251,7 @@ class FeedbackCollector:
 
 ### 3.2 基于知识库的事实核查
 
+::: v-pre
 ```python
 class FactChecker:
     """基于知识库的事实核查器"""
@@ -283,7 +284,7 @@ class FactChecker:
                 断言：{c}
                 已知事实：{relevant_facts}
                 
-                返回 JSON：{{"verdict": "supported/contradicted/unknown", "reason": "简短解释"}}"""
+                返回 JSON：&#123;&#123;"verdict": "supported/contradicted/unknown", "reason": "简短解释"&#125;&#125;"""
                 
                 verdict = llm.invoke(verify_prompt)
                 results.append({"claim": c, "verification": verdict})
@@ -300,6 +301,7 @@ class FactChecker:
                 matches.append(f"{key}: {value}")
         return "\n".join(matches)
 ```
+:::
 
 ### 3.3 自引用一致性检测
 
@@ -341,6 +343,7 @@ async def consistency_check(question: str, llm, n_times: int = 5) -> dict:
 
 ### 3.4 实操：构建一个幻觉检测器
 
+::: v-pre
 ```python
 class HallucinationDetector:
     """综合幻觉检测器"""
@@ -366,7 +369,7 @@ class HallucinationDetector:
 - 0.5：部分忠实，有些信息不在上下文中
 - 0.0：严重不忠实，与上下文矛盾
 
-返回 JSON：{{"score": 0-1, "issues": ["问题1", "问题2"]}}"""
+返回 JSON：&#123;&#123;"score": 0-1, "issues": ["问题1", "问题2"]&#125;&#125;"""
             
             result = await self.llm.ainvoke(faithfulness_prompt)
             scores["faithfulness"] = result
@@ -403,6 +406,7 @@ result = await detector.detect(
 )
 print(f"存在幻觉: {result['has_hallucination']}")
 ```
+:::
 
 > 💡 **幻觉检测不是万能的**。目前没有任何方法能 100% 检测出所有幻觉。最佳策略是**多种方法组合 + 人工抽查**。
 
@@ -689,6 +693,7 @@ def rouge_l(prediction: str, reference: str) -> float:
 
 ### 5.3 LLM-as-Judge：大模型评估大模型
 
+::: v-pre
 ```python
 JUDGE_PROMPT = """你是一个严格的 AI 输出质量评估专家。
 
@@ -703,7 +708,7 @@ AI 回答：{response}
 4. **格式**：格式是否规范
 
 返回 JSON：
-{{"accuracy": 1-5, "completeness": 1-5, "conciseness": 1-5, "format": 1-5, "overall": 1-5, "issues": ["问题列表"]}}"""
+&#123;&#123;"accuracy": 1-5, "completeness": 1-5, "conciseness": 1-5, "format": 1-5, "overall": 1-5, "issues": ["问题列表"]&#125;&#125;"""
 
 async def llm_judge(question: str, reference: str, response: str,
                     judge_llm) -> dict:
@@ -713,9 +718,11 @@ async def llm_judge(question: str, reference: str, response: str,
     result = await judge_llm.ainvoke(prompt)
     return json.loads(result)
 ```
+:::
 
 ### 5.4 集成到 CI/CD：每次发布自动评测
 
+::: v-pre
 ```yaml
 # .github/workflows/prompt-eval.yml
 name: Prompt 质量评测
@@ -737,7 +744,7 @@ jobs:
       - name: 运行评测
         run: python eval/run_eval.py --golden-set golden_sets/v1.2.json
         env:
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_API_KEY: $&#123;&#123; secrets.LLM_API_KEY &#125;&#125;
       
       - name: 质量门禁检查
         run: |
@@ -746,6 +753,7 @@ jobs:
             --min-format 0.95 \
             --report eval_report.json
 ```
+:::
 
 ```python
 # eval/check_gate.py — 质量门禁
@@ -885,6 +893,7 @@ async def run_jailbreak_test(llm, test_cases: list) -> dict:
 
 ### 6.3 红队测试：像黑客一样思考
 
+::: v-pre
 ```python
 # 用 LLM 自动生成对抗样本
 RED_TEAM_PROMPT = """你是一个 AI 安全研究员，负责测试 AI 系统的安全性。
@@ -898,7 +907,7 @@ RED_TEAM_PROMPT = """你是一个 AI 安全研究员，负责测试 AI 系统的
 4. 测试边界情况
 
 返回 JSON 数组：
-[{{"input": "测试输入", "attack_type": "攻击类型", "expected_safe_response": "安全的回复应该是..."}}]"""
+[&#123;&#123;"input": "测试输入", "attack_type": "攻击类型", "expected_safe_response": "安全的回复应该是..."&#125;&#125;]"""
 
 async def auto_red_team(system_role: str, llm) -> list:
     """自动化红队测试：用 LLM 生成攻击用例"""
@@ -906,6 +915,7 @@ async def auto_red_team(system_role: str, llm) -> list:
     result = await llm.ainvoke(prompt)
     return json.loads(result)
 ```
+:::
 
 ### 6.4 实操：构建安全评估套件
 

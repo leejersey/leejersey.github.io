@@ -559,6 +559,7 @@ const { error } = await supabase
 
 把上面的操作整合到一个 React 组件中：
 
+::: v-pre
 ```jsx
 import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
@@ -628,9 +629,9 @@ function TodoApp() {
               checked={todo.is_complete}
               onChange={() => toggleTodo(todo.id, todo.is_complete)}
             />
-            <span style={{
+            <span style=&#123;&#123;
               textDecoration: todo.is_complete ? 'line-through' : 'none'
-            }}>
+            &#125;&#125;>
               {todo.title}
             </span>
             <button onClick={() => deleteTodo(todo.id)}>删除</button>
@@ -643,6 +644,7 @@ function TodoApp() {
 
 export default TodoApp
 ```
+:::
 
 > 🚀 **注意看——整个应用没有写一行后端代码！** 前端直接通过 Supabase JS 客户端操作数据库，RLS 策略在数据库层面保证了安全性。这就是 Supabase 的开发体验。
 
@@ -2734,6 +2736,7 @@ supabase db push
 
 #### CI/CD 集成
 
+::: v-pre
 ```yaml
 # GitHub Actions 示例
 name: Deploy Migrations
@@ -2751,14 +2754,15 @@ jobs:
         with:
           version: latest
 
-      - run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+      - run: supabase link --project-ref $&#123;&#123; secrets.SUPABASE_PROJECT_REF &#125;&#125;
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_ACCESS_TOKEN: $&#123;&#123; secrets.SUPABASE_ACCESS_TOKEN &#125;&#125;
 
       - run: supabase db push
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_ACCESS_TOKEN: $&#123;&#123; secrets.SUPABASE_ACCESS_TOKEN &#125;&#125;
 ```
+:::
 
 ### 4. 类型生成
 

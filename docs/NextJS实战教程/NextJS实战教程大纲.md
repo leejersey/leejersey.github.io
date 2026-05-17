@@ -527,25 +527,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 **Dashboard 布局——只在 /dashboard/* 下生效：**
 
+::: v-pre
 ```tsx
 // app/dashboard/layout.tsx
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex' }}>
-      <aside style={{ width: '250px' }}>
+    <div style=&#123;&#123; display: 'flex' &#125;&#125;>
+      <aside style=&#123;&#123; width: '250px' &#125;&#125;>
         <nav>
           <a href="/dashboard">📊 概览</a>
           <a href="/dashboard/analytics">📈 分析</a>
           <a href="/dashboard/settings">⚙️ 设置</a>
         </nav>
       </aside>
-      <div style={{ flex: 1 }}>
+      <div style=&#123;&#123; flex: 1 &#125;&#125;>
         {children}    {/* 这里渲染 settings/page.tsx 或 analytics/page.tsx */}
       </div>
     </div>
   );
 }
 ```
+:::
 
 **布局嵌套的关键规则：**
 
@@ -3000,7 +3002,7 @@ export async function SignInButton() {
       <form action={async () => {
         'use server';
         await signOut();
-      }}>
+      &#125;&#125;>
         <p>已登录：{session.user.name}</p>
         <button type="submit">登出</button>
       </form>
@@ -3012,13 +3014,13 @@ export async function SignInButton() {
       <form action={async () => {
         'use server';
         await signIn('github');
-      }}>
+      &#125;&#125;>
         <button type="submit">用 GitHub 登录</button>
       </form>
       <form action={async () => {
         'use server';
         await signIn('google');
-      }}>
+      &#125;&#125;>
         <button type="submit">用 Google 登录</button>
       </form>
     </div>
@@ -4514,6 +4516,7 @@ CI/CD 让每次提交代码都自动经过检查、测试、构建、部署—�
 
 **完整的 GitHub Actions 配置：**
 
+::: v-pre
 ```yaml
 # .github/workflows/ci.yml
 name: CI/CD
@@ -4563,7 +4566,7 @@ jobs:
       - run: npm ci
       - run: npm run build
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: $&#123;&#123; secrets.DATABASE_URL &#125;&#125;
 
   # 第 4 步：部署到生产（仅 main 分支）
   deploy:
@@ -4577,6 +4580,7 @@ jobs:
       - name: Deploy to production
         run: echo "部署逻辑放在这里"
 ```
+:::
 
 **部署方案对比：**
 

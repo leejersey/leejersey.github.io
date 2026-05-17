@@ -400,6 +400,7 @@ faster-whisper 关键参数选择：
 
 如果你在 M1/M2/M3/M4 Mac 上开发，`mlx-whisper` 利用 MLX 框架在 Metal GPU 上加速推理：
 
+::: v-pre
 ```python
 """mlx-whisper 离线转录：Apple Silicon Mac 环境"""
 import asyncio
@@ -431,7 +432,7 @@ output = mlx_whisper.transcribe(
 
 text = output.get("text", "").strip()
 with open("{output_file}", "w") as f:
-    json.dump({{"text": text}}, f, ensure_ascii=False)
+    json.dump(&#123;&#123;"text": text&#125;&#125;, f, ensure_ascii=False)
 """
         process = await asyncio.create_subprocess_exec(
             sys.executable, "-c", script,
@@ -448,6 +449,7 @@ with open("{output_file}", "w") as f:
         os.remove(output_file)
         return result["text"]
 ```
+:::
 
 ```
 为什么 mlx-whisper 要用子进程？

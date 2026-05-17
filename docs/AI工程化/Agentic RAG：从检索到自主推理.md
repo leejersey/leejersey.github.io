@@ -102,6 +102,7 @@ async def route_question(question: str) -> dict:
 
 ### 2.2 置信度评估：检索结果够不够好
 
+::: v-pre
 ```python
 async def evaluate_retrieval(question: str, documents: list[str]) -> dict:
     """评估检索结果是否足够回答问题"""
@@ -113,7 +114,7 @@ async def evaluate_retrieval(question: str, documents: list[str]) -> dict:
 {chr(10).join(f'[{i+1}] {doc[:200]}' for i, doc in enumerate(documents))}
 
 输出 JSON：
-{{"sufficient": true/false, "confidence": 0.0~1.0, "missing": "缺少什么信息"}}"""
+&#123;&#123;"sufficient": true/false, "confidence": 0.0~1.0, "missing": "缺少什么信息"&#125;&#125;"""
     
     response = await client.chat.completions.create(
         model="gpt-4o-mini",
@@ -122,6 +123,7 @@ async def evaluate_retrieval(question: str, documents: list[str]) -> dict:
     )
     return json.loads(response.choices[0].message.content)
 ```
+:::
 
 ### 2.3 自适应检索：动态决定检索策略
 
@@ -167,6 +169,7 @@ async def adaptive_retrieve(question: str, knowledge_base) -> list[str]:
 
 ### 3.1 查询分解：复杂问题拆成子问题
 
+::: v-pre
 ```python
 async def decompose_query(question: str) -> list[str]:
     """将复杂问题拆解为多个子查询"""
@@ -174,7 +177,7 @@ async def decompose_query(question: str) -> list[str]:
 
 问题：{question}
 
-输出 JSON：{{"sub_queries": ["子查询1", "子查询2", ...]}}"""
+输出 JSON：&#123;&#123;"sub_queries": ["子查询1", "子查询2", ...]&#125;&#125;"""
     
     response = await client.chat.completions.create(
         model="gpt-4o-mini",
@@ -189,6 +192,7 @@ async def decompose_query(question: str) -> list[str]:
 # → ["React 大型项目性能表现", "Vue 大型项目性能表现", 
 #    "React 学习曲线", "Vue 学习曲线"]
 ```
+:::
 
 ### 3.2 HyDE：假设性文档嵌入
 
@@ -326,6 +330,7 @@ async def react_agent(question: str, tools: dict, max_steps: int = 5) -> str:
 
 ### 4.2 自我反思：检查答案质量并修正
 
+::: v-pre
 ```python
 async def self_reflect(question: str, answer: str, sources: list[str]) -> dict:
     """反思答案质量：是否有依据、是否完整、是否准确"""
@@ -340,7 +345,7 @@ async def self_reflect(question: str, answer: str, sources: list[str]) -> dict:
 2. 答案是否完整回答了问题？
 3. 答案是否有明显错误？
 
-输出 JSON：{{"quality": "good|needs_improvement|poor", "issues": ["问题1", ...], "suggestion": "改进建议"}}"""
+输出 JSON：&#123;&#123;"quality": "good|needs_improvement|poor", "issues": ["问题1", ...], "suggestion": "改进建议"&#125;&#125;"""
     
     response = await client.chat.completions.create(
         model="gpt-4o-mini",
@@ -349,6 +354,7 @@ async def self_reflect(question: str, answer: str, sources: list[str]) -> dict:
     )
     return json.loads(response.choices[0].message.content)
 ```
+:::
 
 ### 4.3 CRAG：纠正性检索增强生成
 
@@ -380,6 +386,7 @@ async def corrective_rag(question: str, knowledge_base) -> str:
 
 ### 4.4 多跳推理：链式检索回答复杂问题
 
+::: v-pre
 ```python
 async def multi_hop_reasoning(question: str, knowledge_base) -> str:
     """多跳推理：需要多次检索才能回答的问题"""
@@ -398,8 +405,8 @@ async def multi_hop_reasoning(question: str, knowledge_base) -> str:
 原始问题：{question}
 已有信息：{chr(10).join(context)}
 
-如果能回答，输出 {{"can_answer": true}}
-如果还需要更多信息，输出 {{"can_answer": false, "next_query": "下一步应该查什么"}}"""
+如果能回答，输出 &#123;&#123;"can_answer": true&#125;&#125;
+如果还需要更多信息，输出 &#123;&#123;"can_answer": false, "next_query": "下一步应该查什么"&#125;&#125;"""
         
         result = await llm_json(eval_prompt)
         
@@ -409,6 +416,7 @@ async def multi_hop_reasoning(question: str, knowledge_base) -> str:
     
     return await generate_answer(question, context)
 ```
+:::
 
 > 💡 **CRAG 的核心洞察：不是所有检索结果都值得信任**——低质量的检索结果喂给 LLM，不如不检索。CRAG 加了一层"纠正"——结果不好就换数据源（网络搜索），而不是硬用差结果。
 
@@ -437,7 +445,7 @@ tools = [
             "description": "搜索知识库文档（产品文档、FAQ、技术手册）",
             "parameters": {
                 "type": "object",
-                "properties": {"query": {"type": "string"}},
+                "properties": {"query": {"type": "string"&#125;&#125;,
                 "required": ["query"],
             },
         },
@@ -449,7 +457,7 @@ tools = [
             "description": "查询业务数据库（订单、用户、销售数据）",
             "parameters": {
                 "type": "object",
-                "properties": {"sql": {"type": "string", "description": "SQL 查询语句"}},
+                "properties": {"sql": {"type": "string", "description": "SQL 查询语句"&#125;&#125;,
                 "required": ["sql"],
             },
         },
@@ -461,7 +469,7 @@ tools = [
             "description": "搜索互联网（实时信息、最新新闻）",
             "parameters": {
                 "type": "object",
-                "properties": {"query": {"type": "string"}},
+                "properties": {"query": {"type": "string"&#125;&#125;,
                 "required": ["query"],
             },
         },

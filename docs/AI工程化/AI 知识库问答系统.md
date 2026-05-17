@@ -627,6 +627,7 @@ class ContextManager:
 
 ### 5.3 "我不知道"的勇气：拒答与兜底
 
+::: v-pre
 ```python
 class RefusalDetector:
     """判断是否应该拒绝回答"""
@@ -642,7 +643,7 @@ class RefusalDetector:
         relevance_prompt = f"""判断以下文档是否能回答用户问题。
 问题：{question}
 文档摘要：{docs[0]['content'][:300]}
-回复 JSON：{{"relevant": true/false, "confidence": 0-1}}"""
+回复 JSON：&#123;&#123;"relevant": true/false, "confidence": 0-1&#125;&#125;"""
         
         result = await self.llm.chat("deepseek", [
             {"role": "user", "content": relevance_prompt}
@@ -654,9 +655,11 @@ class RefusalDetector:
         
         return {"refuse": False}
 ```
+:::
 
 ### 5.4 答案质量控制：幻觉检测与事实核验
 
+::: v-pre
 ```python
 class HallucinationDetector:
     """幻觉检测：检查答案是否有文档依据"""
@@ -671,11 +674,11 @@ class HallucinationDetector:
 
 检查每个关键事实是否有出处。
 回复 JSON：
-{{
+&#123;&#123;
   "has_hallucination": true/false,
   "unsupported_claims": ["没有依据的描述1", ...],
   "confidence": 0-1
-}}"""
+&#125;&#125;"""
         
         result = await self.llm.chat("deepseek", [
             {"role": "user", "content": prompt}
@@ -683,6 +686,7 @@ class HallucinationDetector:
         
         return json.loads(result.choices[0].message.content)
 ```
+:::
 
 > 💡 **"我不知道"比"编一个答案"强 100 倍**——知识库问答的信任基石是准确性，一旦用户发现 AI 编造答案，就再也不会信任这个系统。
 
@@ -832,7 +836,7 @@ class ConfidenceScorer:
         level = "高" if overall > 0.7 else "中" if overall > 0.4 else "低"
         
         return {"score": round(overall, 2), "level": level,
-                "detail": {"retrieval": retrieval_conf, "citation": citation_conf}}
+                "detail": {"retrieval": retrieval_conf, "citation": citation_conf&#125;&#125;
 ```
 
 **第 6 章核心知识回顾：**
@@ -953,6 +957,7 @@ class PermissionManager:
 
 ### 7.4 多知识库路由：按主题自动选择知识库
 
+::: v-pre
 ```python
 class KBRouter:
     """多知识库路由"""
@@ -973,7 +978,7 @@ class KBRouter:
 
 问题：{question}
 
-回复 JSON：{{"selected": ["知识库名1", "知识库名2"]}}"""
+回复 JSON：&#123;&#123;"selected": ["知识库名1", "知识库名2"]&#125;&#125;"""
         
         result = await self.llm.chat("deepseek", [
             {"role": "user", "content": prompt}
@@ -981,6 +986,7 @@ class KBRouter:
         
         return json.loads(result.choices[0].message.content)["selected"]
 ```
+:::
 
 **第 7 章核心知识回顾：**
 

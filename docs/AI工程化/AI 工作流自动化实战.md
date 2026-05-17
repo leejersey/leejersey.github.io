@@ -295,6 +295,7 @@ docker compose up -d
 
 n8n 的心智模型很简单：**触发器启动 → 节点处理 → 连接传递数据 → 凭证授权访问外部服务**。
 
+::: v-pre
 ```
 n8n 工作流的四个核心概念：
 
@@ -318,7 +319,7 @@ n8n 工作流的四个核心概念：
   ═══════════════════════════════════════
   • 上一个节点的输出 = 下一个节点的输入
   • 数据格式：JSON 数组 [{ key: value }, ...]
-  • 可以用表达式引用：{{ $json.fieldName }}
+  • 可以用表达式引用：&#123;&#123; $json.fieldName &#125;&#125;
 
   ④ Credential（凭证）── 安全存储的密钥
   ═══════════════════════════════════════
@@ -326,6 +327,7 @@ n8n 工作流的四个核心概念：
   • AES-256 加密存储
   • 一次配置，所有工作流共享
 ```
+:::
 
 **第一个工作流：Hello World（每小时获取天气并推送）：**
 
@@ -469,6 +471,7 @@ ollama serve  # 默认监听 http://localhost:11434
 
 **n8n 中的 Prompt 模板（使用表达式变量）：**
 
+::: v-pre
 ```
 System Prompt:
 你是一个邮件分析助手。对每封邮件进行分析，
@@ -477,9 +480,9 @@ System Prompt:
 User Prompt:
 请分析以下邮件：
 
-发件人：{{ $json.from }}
-主题：{{ $json.subject }}
-正文：{{ $json.body }}
+发件人：&#123;&#123; $json.from &#125;&#125;
+主题：&#123;&#123; $json.subject &#125;&#125;
+正文：&#123;&#123; $json.body &#125;&#125;
 
 输出格式：
 {
@@ -489,6 +492,7 @@ User Prompt:
   "action_required": true或false
 }
 ```
+:::
 
 **用 Code 节点做后处理（防止 LLM 输出不合规）：**
 
@@ -629,6 +633,7 @@ return batches;
 
 **LLM 分析的 Prompt 设计：**
 
+::: v-pre
 ```
 你是一个技术内容分析助手。我的技术栈是：
 Python, FastAPI, Docker, AI/LLM, 前端 React。
@@ -644,8 +649,9 @@ Python, FastAPI, Docker, AI/LLM, 前端 React。
 ]
 
 文章列表：
-{{ $json.batch_text }}
+&#123;&#123; $json.batch_text &#125;&#125;
 ```
+:::
 
 **过滤和排序的 Code 节点：**
 
@@ -751,12 +757,13 @@ return [{ json: { message } }];
 
 **LLM 整理的 Prompt：**
 
+::: v-pre
 ```
 请将以下会议转录整理为结构化会议纪要，格式如下：
 
 ## 会议基本信息
 - 主题：（从内容推断）
-- 时长：{{ $json.duration }}
+- 时长：&#123;&#123; $json.duration &#125;&#125;
 
 ## 关键讨论点
 1. [讨论点]：[结论或共识]
@@ -768,8 +775,9 @@ return [{ json: { message } }];
 - [决策内容]
 
 转录内容：
-{{ $json.transcript }}
+&#123;&#123; $json.transcript &#125;&#125;
 ```
+:::
 
 | 方案 | STT 成本 | LLM 成本 | 总成本/小时会议 |
 |:---|:---|:---|:---|
@@ -819,6 +827,7 @@ return [{ json: { message } }];
 
 **合同提取的 Prompt：**
 
+::: v-pre
 ```
 请从以下合同文本中提取关键信息，输出 JSON：
 
@@ -839,8 +848,9 @@ return [{ json: { message } }];
 注意：只提取文本中明确出现的信息，无法确定的字段填 null。
 
 合同全文：
-{{ $json.text }}
+&#123;&#123; $json.text &#125;&#125;
 ```
+:::
 
 **三种文档类型的提取示例：**
 
@@ -914,14 +924,15 @@ return [{ json: { changed: false } }];
 
 **LLM 分析变化的 Prompt：**
 
+::: v-pre
 ```
 你是一个竞品分析专家。以下是竞品网站的页面变化：
 
 旧版本：
-{{ $json.old_content }}
+&#123;&#123; $json.old_content &#125;&#125;
 
 新版本：
-{{ $json.new_content }}
+&#123;&#123; $json.new_content &#125;&#125;
 
 请分析：
 1. 具体变化了什么（新功能/价格调整/界面改版）
@@ -930,6 +941,7 @@ return [{ json: { changed: false } }];
 
 输出格式简洁，控制在 200 字以内。
 ```
+:::
 
 > 💡 **`$workflow.staticData` 是 n8n 的持久化存储**——它在工作流的多次执行之间保持数据。非常适合存"上次抓取的内容 hash"这类跨执行状态，不需要外部数据库。
 ### 5.3 用户反馈分析：多渠道汇聚→分类→周报
@@ -969,6 +981,7 @@ return [{ json: { changed: false } }];
 
 **反馈分析的 Prompt：**
 
+::: v-pre
 ```
 分析以下用户反馈，为每条输出 JSON：
 [
@@ -982,8 +995,9 @@ return [{ json: { changed: false } }];
 ]
 
 反馈列表：
-{{ $json.batch_text }}
+&#123;&#123; $json.batch_text &#125;&#125;
 ```
+:::
 
 **周报生成的统计 Code：**
 
@@ -1055,10 +1069,11 @@ return [{ json: stats }];
 
 **日志分析的 Prompt：**
 
+::: v-pre
 ```
 你是一个资深 SRE 工程师。请分析以下服务器错误日志：
 
-{{ $json.error_logs }}
+&#123;&#123; $json.error_logs &#125;&#125;
 
 请输出 JSON：
 {
@@ -1075,6 +1090,7 @@ return [{ json: stats }];
 - warning：性能下降、非关键服务异常
 - noise：已知问题、定时任务报错、调试日志
 ```
+:::
 
 | 传统告警 | AI 告警 |
 |:---|:---|
@@ -1184,21 +1200,22 @@ return [{
 
 **LLM 降噪的 Prompt：**
 
+::: v-pre
 ```
 你是一个运维告警分析专家。请判断以下告警的真实严重程度。
 
 告警信息：
-- 来源：{{ $json.source }}
-- 内容：{{ $json.message }}
-- 触发时间：{{ $json.timestamp }}
-- 最近 1 小时同类告警数：{{ $json.count }}
+- 来源：&#123;&#123; $json.source &#125;&#125;
+- 内容：&#123;&#123; $json.message &#125;&#125;
+- 触发时间：&#123;&#123; $json.timestamp &#125;&#125;
+- 最近 1 小时同类告警数：&#123;&#123; $json.count &#125;&#125;
 
 判断标准：
 - critical：直接影响线上用户，需要立刻处理
 - warning：有潜在风险但不紧急，可以白天处理
 - noise：已知问题/误报/开发环境，不需要通知
 
-历史规律：这个告警在过去 7 天触发了 {{ $json.weekly_count }} 次。
+历史规律：这个告警在过去 7 天触发了 &#123;&#123; $json.weekly_count &#125;&#125; 次。
 
 输出 JSON：
 {
@@ -1206,6 +1223,7 @@ return [{
   "reason": "判断理由（一句话）"
 }
 ```
+:::
 
 **去重的 Code 节点：**
 
@@ -1277,19 +1295,21 @@ n8n 的错误处理三层机制：
 
 **Error Workflow 的标准实现：**
 
+::: v-pre
 ```
 Error Trigger
     │ 自动接收：错误信息、失败节点名、工作流名
     ▼
 Code (格式化)
     │ "🔴 工作流失败告警
-    │  工作流：{{ $json.workflow.name }}
-    │  节点：{{ $json.execution.lastNodeExecuted }}
-    │  错误：{{ $json.execution.error.message }}
-    │  时间：{{ $json.execution.startedAt }}"
+    │  工作流：&#123;&#123; $json.workflow.name &#125;&#125;
+    │  节点：&#123;&#123; $json.execution.lastNodeExecuted &#125;&#125;
+    │  错误：&#123;&#123; $json.execution.error.message &#125;&#125;
+    │  时间：&#123;&#123; $json.execution.startedAt &#125;&#125;"
     ▼
 飞书 / Telegram (发送告警)
 ```
+:::
 
 | 错误类型 | 处理策略 | 配置位置 |
 |:---|:---|:---|
@@ -1419,31 +1439,35 @@ git commit -am "fix: 优化 RSS 日报的 Prompt，提升筛选准确率"
 
 n8n 提供两种条件分支节点：**IF**（二选一）和 **Switch**（多选一）。
 
+::: v-pre
 ```
 IF 节点（二分支）：
 
   LLM 分析结果
       │
       ▼
-  IF: {{ $json.urgency }} === "high"
+  IF: &#123;&#123; $json.urgency &#125;&#125; === "high"
       │
       ├── true  → 立即通知
       └── false → 汇总到日报
 ```
+:::
 
+::: v-pre
 ```
 Switch 节点（多分支）：
 
   LLM 分类结果
       │
       ▼
-  Switch: {{ $json.category }}
+  Switch: &#123;&#123; $json.category &#125;&#125;
       │
       ├── "bug"             → 创建 Jira Issue
       ├── "feature_request" → 加入需求池（Notion）
       ├── "praise"          → 转发到团队群
       └── default           → 归档
 ```
+:::
 
 **动态路由的 Code 实现（更灵活）：**
 

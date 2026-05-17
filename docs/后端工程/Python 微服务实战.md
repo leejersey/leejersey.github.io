@@ -752,6 +752,7 @@ async def metrics():
 
 ### 7.4 告警规则与 SLA 管理
 
+::: v-pre
 ```yaml
 # Prometheus 告警规则
 groups:
@@ -761,20 +762,21 @@ groups:
         expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
         for: 5m
         annotations:
-          summary: "{{ $labels.service }} 错误率超过 5%"
+          summary: "&#123;&#123; $labels.service &#125;&#125; 错误率超过 5%"
       
       - alert: HighLatency
         expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
         for: 5m
         annotations:
-          summary: "{{ $labels.service }} P95 延迟超过 2 秒"
+          summary: "&#123;&#123; $labels.service &#125;&#125; P95 延迟超过 2 秒"
       
       - alert: ServiceDown
         expr: up == 0
         for: 1m
         annotations:
-          summary: "{{ $labels.instance }} 服务不可用"
+          summary: "&#123;&#123; $labels.instance &#125;&#125; 服务不可用"
 ```
+:::
 
 **第 7 章核心知识回顾：**
 
@@ -1031,6 +1033,7 @@ spec:
 
 ### 9.4 CI/CD Pipeline（GitHub Actions → K8s）
 
+::: v-pre
 ```yaml
 # .github/workflows/deploy.yml
 name: Deploy
@@ -1045,15 +1048,16 @@ jobs:
       
       - name: Build & Push
         run: |
-          docker build -t registry.example.com/order-service:${{ github.sha }} .
-          docker push registry.example.com/order-service:${{ github.sha }}
+          docker build -t registry.example.com/order-service:$&#123;&#123; github.sha &#125;&#125; .
+          docker push registry.example.com/order-service:$&#123;&#123; github.sha &#125;&#125;
       
       - name: Deploy to K8s
         run: |
           kubectl set image deployment/order-service \
-            order-service=registry.example.com/order-service:${{ github.sha }}
+            order-service=registry.example.com/order-service:$&#123;&#123; github.sha &#125;&#125;
           kubectl rollout status deployment/order-service
 ```
+:::
 
 **第 9 章核心知识回顾：**
 

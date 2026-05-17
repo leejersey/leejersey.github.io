@@ -59,12 +59,12 @@ Schedule Trigger → HTTP Request → Set → Notification
 n8n 节点之间传递的是结构化 JSON 数据。
 
 ### 6.1 访问上一步数据
-- 在字段中使用表达式语法：`{{$json.fieldName}}`
-- 访问上一步节点：`{{$node["HTTP Request"].json}}`
+- 在字段中使用表达式语法：`<span v-pre>&#123;&#123; $json.fieldName &#125;&#125;</span>`
+- 访问上一步节点：`<span v-pre>&#123;&#123; $node["HTTP Request"].json &#125;&#125;</span>`
 
 ### 6.2 常见用法
-- 拼接字符串：`{{$json.firstName + " " + $json.lastName}}`
-- 取数组第一个元素：`{{$json.items[0]}}`
+- 拼接字符串：`<span v-pre>&#123;&#123; $json.firstName + " " + $json.lastName &#125;&#125;</span>`
+- 取数组第一个元素：`<span v-pre>&#123;&#123; $json.items[0] &#125;&#125;</span>`
 - 时间处理：可用 JavaScript 表达式进行简单计算
 
 ## 7. 常用节点类型

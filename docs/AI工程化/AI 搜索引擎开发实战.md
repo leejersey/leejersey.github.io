@@ -352,6 +352,7 @@ def build_context(sources: list[dict]) -> str:
 
 ### 4.3 相关性排序：优先使用最相关的内容
 
+::: v-pre
 ```python
 async def rerank_sources(query: str, sources: list[dict]) -> list[dict]:
     """用 LLM 对搜索结果进行相关性重排"""
@@ -363,7 +364,7 @@ async def rerank_sources(query: str, sources: list[dict]) -> list[dict]:
 搜索结果：
 {chr(10).join(f"[{s['index']}] {s['title']}: {s['content'][:200]}" for s in sources)}
 
-按 JSON 格式输出：[{{"index": 1, "score": 8}}, ...]"""
+按 JSON 格式输出：[&#123;&#123;"index": 1, "score": 8&#125;&#125;, ...]"""
     
     response = await client.chat.completions.create(
         model="gpt-4o-mini",
@@ -376,6 +377,7 @@ async def rerank_sources(query: str, sources: list[dict]) -> list[dict]:
     score_map = {s["index"]: s["score"] for s in scores}
     return sorted(sources, key=lambda s: score_map.get(s["index"], 0), reverse=True)
 ```
+:::
 
 ### 4.4 Prompt 设计：基于证据回答 + 引用标注
 

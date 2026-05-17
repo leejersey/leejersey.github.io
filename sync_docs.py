@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """
 Obsidian → VitePress 同步脚本
-从 Obsidian 仓库复制 .md 文件到 VitePress docs/ 目录，
-转换 [[wikilink]] 为标准 markdown 相对链接。
 """
 
 import os
@@ -24,7 +22,6 @@ EXCLUDE_DIRS = {
 EXCLUDE_FILES = {".DS_Store"}
 PRESERVE_IN_DOCS = {".vitepress", "public", "index.md", "guide.md", "stylesheets"}
 
-# 目录中文名映射（用于 sidebar 显示）
 DIR_LABELS = {
     "AI工程化": "🔬 AI 工程化",
     "AI应用开发": "🤖 AI 应用开发",
@@ -96,7 +93,6 @@ def compute_relative_path(from_file: str, to_file: str) -> str:
         rel = os.path.relpath(str(to_path), str(from_dir))
     except ValueError:
         rel = str(to_path)
-    # 去掉 .md 后缀（VitePress 的 cleanUrls 模式）
     if rel.endswith(".md"):
         rel = rel[:-3]
     return rel.replace("\\", "/")
@@ -147,18 +143,15 @@ def convert_wikilinks(content: str, file_rel_path: str, file_index: dict) -> str
 
 
 def convert_obsidian_callouts(content: str) -> str:
-    """转换 Obsidian callout 为 VitePress 自定义容器"""
     lines = content.split("\n")
     result = []
     i = 0
-
     while i < len(lines):
         line = lines[i]
         callout_match = re.match(r'^>\s*\[!(\w+)\]\s*(.*)?$', line)
         if callout_match:
             callout_type = callout_match.group(1).lower()
             title = callout_match.group(2) or ""
-            # VitePress 自定义容器类型
             type_map = {
                 "note": "info", "tip": "tip", "important": "important",
                 "warning": "warning", "caution": "danger", "danger": "danger",
@@ -180,48 +173,123 @@ def convert_obsidian_callouts(content: str) -> str:
             continue
         result.append(line)
         i += 1
-
     return "\n".join(result)
+
+
+def escape_vue_template_syntax(content: str) -> str:
+    """
+    转义 {{ }} 双大括号，防止 VitePress (Vue) 把它当模板表达式解析。
+    只转义代码块外的不处理（代码块内的用 v-pre 处理）。
+    
+    最简单可靠的方式：如果文件包含 {{ }}，在代码块上添加 v-pre。
+    """
+    if '{{' not in content:
+        return content
+    
+    lines = content.split('\n')
+    result = []
+    in_code_block = False
+    code_block_start_idx = -1
+    has_template_in_block = False
+    
+    for i, line in enumerate(lines):
+        if line.strip().startswith('```') and not in_code_block:
+            in_code_block = True
+            code_block_start_idx = len(result)
+            has_template_in_block = False
+            result.append(line)
+        elif line.strip().startswith('```') and in_code_block:
+            in_code_block = False
+            if has_template_in_block:
+                # 在代码块开始标记后加 v-pre
+                old_start = result[code_block_start_idx]
+                # 如果还没有 v-pre 标记，在代码块前后包裹
+                # 使用 raw 块方式
+                pass  # 下面统一处理
+            result.append(line)
+        else:
+            if in_code_block and '{{' in line:
+                has_template_in_block = True
+            result.append(line)
+    
+    # 更简单的方式：对包含 {{ 的文件，在 frontmatter 后添加 <script setup> 标签
+    # 或者直接用 {% raw %} 方式转义
+    # 最可靠：用正则替换代码块外的 {{ }} 为 HTML 实体
+    
+    # 实际最简单方案：在整个文件外包一层 <div v-pre> 不行（会影响组件）
+    # 用正则把非代码块中的 {{ xxx }} 替换为 { { xxx } }
+    
+    # 重新处理：逐行扫描，在代码块内的 {{ 用 raw 包裹整个代码块
+    final_lines = content.split('\n')
+    output = []
+    in_code = False
+    block_lines = []
+    block_has_braces = False
+    
+    for line in final_lines:
+        stripped = line.strip()
+        if stripped.startswith('```') and not in_code:
+            in_code = True
+            block_lines = [line]
+            block_has_braces = False
+        elif stripped.startswith('```') and in_code:
+            block_lines.append(line)
+            in_code = False
+            if block_has_braces:
+                # 在代码块前后加 v-pre
+                output.append('::: v-pre')
+                output.extend(block_lines)
+                output.append(':::')
+            else:
+                output.extend(block_lines)
+            block_lines = []
+        elif in_code:
+            if '{{' in line:
+                block_has_braces = True
+            block_lines.append(line)
+        else:
+            # 非代码块中的 {{ }}，用 v-pre span 包裹
+            if '{{' in line and '}}' in line:
+                line = re.sub(r'\{\{(.*?)\}\}', r'<span v-pre>{{ \1 }}</span>', line)
+            output.append(line)
+    
+    # 如果文件以未关闭的代码块结尾
+    if block_lines:
+        output.extend(block_lines)
+    
+    return '\n'.join(output)
 
 
 def process_file(src: Path, dst: Path, file_rel_path: str, file_index: dict):
     content = src.read_text(encoding="utf-8")
     content = convert_wikilinks(content, file_rel_path, file_index)
     content = convert_obsidian_callouts(content)
+    # 转义 {{ }} 防止 Vue 模板引擎解析
+    content = content.replace('{{', '&#123;&#123;').replace('}}', '&#125;&#125;')
+    # 转义 {{ }} 防止 Vue 解析
+    content = content.replace('{{', '&#123;&#123;').replace('}}', '&#125;&#125;')
     dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_text(content, encoding="utf-8")
 
 
 def generate_sidebar() -> dict:
-    """自动生成 VitePress sidebar 配置"""
     sidebar = {}
     docs_path = MKDOCS_DOCS
-
     for dir_path in sorted(docs_path.iterdir()):
         if not dir_path.is_dir():
             continue
         dir_name = dir_path.name
         if dir_name in PRESERVE_IN_DOCS or dir_name.startswith("."):
             continue
-
         items = []
-        # 查找大纲/索引文件
         for md_file in sorted(dir_path.rglob("*.md")):
             rel = md_file.relative_to(docs_path)
             name = md_file.stem
             link = f"/{str(rel).replace(os.sep, '/')[:-3]}"
             items.append({"text": name, "link": link})
-
         if items:
             label = DIR_LABELS.get(dir_name, dir_name)
-            sidebar[f"/{dir_name}/"] = [
-                {
-                    "text": label,
-                    "collapsed": True,
-                    "items": items
-                }
-            ]
-
+            sidebar[f"/{dir_name}/"] = [{"text": label, "collapsed": True, "items": items}]
     return sidebar
 
 
@@ -230,16 +298,12 @@ def sync():
     print(f"📁 VitePress 目标: {MKDOCS_DOCS}")
     print(f"🚫 排除目录:      {', '.join(sorted(EXCLUDE_DIRS))}")
     print()
-
     print("🔍 构建文件索引...")
     file_index = build_file_index()
     print(f"   索引条目: {len(file_index)}")
-
     clean_docs_dir()
-
     file_count = 0
     dir_count = set()
-
     for src_path in OBSIDIAN_VAULT.rglob("*.md"):
         if should_skip(src_path):
             continue
@@ -252,19 +316,16 @@ def sync():
         file_count += 1
         dir_count.add(rel_path.parent)
 
-    # 生成 guide.md（知识库总览）— 从 HOME.md 转换
     home_src = OBSIDIAN_VAULT / "HOME.md"
     if home_src.exists():
         process_file(home_src, MKDOCS_DOCS / "guide.md", "guide.md", file_index)
         print("🏠 HOME.md → guide.md（知识库总览）")
 
-    # 生成 sidebar
     print("📋 生成 sidebar 配置...")
     sidebar = generate_sidebar()
     sidebar_path = MKDOCS_DOCS / ".vitepress" / "sidebar.json"
     sidebar_path.write_text(json.dumps(sidebar, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"   侧边栏分组: {len(sidebar)} 个")
-
     print(f"\n✅ 同步完成！")
     print(f"   📄 文件: {file_count} 篇")
     print(f"   📂 目录: {len(dir_count)} 个")

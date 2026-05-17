@@ -187,13 +187,14 @@ Manager-Worker 模式：
              Manager（汇总+质检）→ 最终交付
 ```
 
+::: v-pre
 ```python
 async def manager_worker(requirement: str):
     # Manager 分解任务
     plan = await manager.run(f"""分析以下需求，拆解为具体任务：
     {requirement}
     
-    返回 JSON: [{{"agent": "coder/tester/doc", "task": "具体任务描述"}}]""")
+    返回 JSON: [&#123;&#123;"agent": "coder/tester/doc", "task": "具体任务描述"&#125;&#125;]""")
     
     tasks = json.loads(plan)
     
@@ -207,6 +208,7 @@ async def manager_worker(requirement: str):
     final = await manager.run(f"检查以下工作成果，给出整体评估:\n{results}")
     return final
 ```
+:::
 
 **适用场景**：复杂项目需要统一协调，Manager 充当"项目经理"角色。
 

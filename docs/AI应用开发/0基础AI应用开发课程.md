@@ -6542,7 +6542,7 @@ const ChatPage = () => {
                         </div>
                     ))}
                 </div>
-                <form onSubmit={(e) => { e.preventDefault(); handleSend(); }}>
+                <form onSubmit={(e) => { e.preventDefault(); handleSend(); &#125;&#125;>
                     <input value={input} onChange={e => setInput(e.target.value)} />
                     <button type="submit">发送</button>
                 </form>
@@ -7368,7 +7368,7 @@ print(chat_with_tools("你好，你是谁？"))
         ↓
 AI 分析："这个问题需要查天气，我有 get_weather 工具"
         ↓
-AI 返回：tool_calls: [{name: "get_weather", args: {city: "北京"}}]
+AI 返回：tool_calls: [{name: "get_weather", args: {city: "北京"&#125;&#125;]
         ↓
 你的代码执行：get_weather("北京") → {temp: 28, weather: "多云"}
         ↓
@@ -8642,7 +8642,7 @@ response = client.chat.completions.create(
             "role": "user",
             "content": [
                 {"type": "text", "text": "这张图片里有什么？"},
-                {"type": "image_url", "image_url": {"url": "https://example.com/photo.jpg"}}
+                {"type": "image_url", "image_url": {"url": "https://example.com/photo.jpg"&#125;&#125;
             ]
         }
     ]
@@ -8994,6 +8994,7 @@ App → Layout → Sidebar → ChatList → ChatItem
 
 ### G.2 Context API：React 内置方案
 
+::: v-pre
 ```jsx
 import { createContext, useContext, useState } from "react";
 
@@ -9005,7 +9006,7 @@ function App() {
     const [user, setUser] = useState(null);
     
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value=&#123;&#123; user, setUser &#125;&#125;>
             <Layout />
         </UserContext.Provider>
     );
@@ -9017,6 +9018,7 @@ function ChatHeader() {
     return <h2>欢迎，{user?.name || "游客"}</h2>;
 }
 ```
+:::
 
 **Context API 的局限**：适合简单场景（主题、语言、用户信息）。状态多了之后代码会很乱，且每次状态变化会触发所有消费组件重渲染。
 
@@ -9082,7 +9084,7 @@ function ChatInput() {
     };
     
     return (
-        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); &#125;&#125;>
             <input value={input} onChange={e => setInput(e.target.value)} />
             <button disabled={loading}>{loading ? "发送中..." : "发送"}</button>
         </form>

@@ -2149,6 +2149,7 @@ npx sst remove --stage dev
 
 **AWS Lambda 的完整 CI/CD 流水线：**
 
+::: v-pre
 ```yaml
 # .github/workflows/deploy.yml
 name: Deploy
@@ -2160,7 +2161,7 @@ on:
     branches: [main]           # PR → 部署预览环境
 
 concurrency:
-  group: deploy-${{ github.ref }}
+  group: deploy-$&#123;&#123; github.ref &#125;&#125;
   cancel-in-progress: true     # 同一分支的新推送取消旧部署
 
 jobs:
@@ -2193,13 +2194,13 @@ jobs:
       # 使用 OIDC 获取 AWS 临时凭证（比存 Access Key 更安全）
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: $&#123;&#123; secrets.AWS_ROLE_ARN &#125;&#125;
           aws-region: ap-northeast-1
 
       # 根据分支决定部署环境
       - name: Deploy to staging (PR)
         if: github.event_name == 'pull_request'
-        run: npx sst deploy --stage pr-${{ github.event.number }}
+        run: npx sst deploy --stage pr-$&#123;&#123; github.event.number &#125;&#125;
 
       - name: Deploy to production (main)
         if: github.ref == 'refs/heads/main'
@@ -2213,10 +2214,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: $&#123;&#123; secrets.AWS_ROLE_ARN &#125;&#125;
           aws-region: ap-northeast-1
-      - run: npx sst remove --stage pr-${{ github.event.number }}
+      - run: npx sst remove --stage pr-$&#123;&#123; github.event.number &#125;&#125;
 ```
+:::
 
 **Vercel / Cloudflare 的零配置部署：**
 

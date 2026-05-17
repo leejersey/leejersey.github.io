@@ -227,6 +227,7 @@ async def complex_workflow(question: str):
 
 ### 3.2 Langfuse Prompt Management 实战
 
+::: v-pre
 ```python
 from langfuse import Langfuse
 
@@ -235,7 +236,7 @@ langfuse = Langfuse()
 # 创建/更新 Prompt（在 Langfuse 控制台或 API）
 langfuse.create_prompt(
     name="customer_service",
-    prompt="你是一个专业客服。基于以下知识库内容回答用户问题：\n\n{{context}}\n\n用户问题：{{question}}",
+    prompt="你是一个专业客服。基于以下知识库内容回答用户问题：\n\n&#123;&#123;context&#125;&#125;\n\n用户问题：&#123;&#123;question&#125;&#125;",
     labels=["production"],          # 标签：production / staging / dev
     config={"model": "gpt-4o", "temperature": 0.3},
 )
@@ -253,9 +254,11 @@ async def answer_with_managed_prompt(question: str, context: str):
     )
     return response.choices[0].message.content
 ```
+:::
 
 ### 3.3 Prompt 模板化：变量绑定与渲染
 
+::: v-pre
 ```python
 class PromptTemplate:
     """Prompt 模板管理器"""
@@ -279,11 +282,12 @@ class PromptTemplate:
         prompt_data = self.get(name)
         template = prompt_data["template"]
         for key, value in variables.items():
-            template = template.replace(f"{{{{{key}}}}}", str(value))
+            template = template.replace(f"&#123;&#123;&#123;&#123;{key&#125;&#125;&#125;&#125;}", str(value))
         return template
 
 prompt_mgr = PromptTemplate(langfuse)
 ```
+:::
 
 ### 3.4 Prompt 灰度发布与快速回滚
 
@@ -323,6 +327,7 @@ async def prompt_canary_deploy(prompt_name: str, new_version: str, traffic_pct: 
 
 ### 4.1 LLM-as-Judge：用大模型评大模型
 
+::: v-pre
 ```python
 JUDGE_PROMPT = """评估以下 AI 回答的质量。
 
@@ -335,7 +340,7 @@ AI 回答：{answer}
 2. 忠实性：回答是否基于参考内容，没有编造
 3. 完整性：回答是否全面
 
-输出 JSON：{{"relevance": N, "faithfulness": N, "completeness": N, "explanation": "..."}}"""
+输出 JSON：&#123;&#123;"relevance": N, "faithfulness": N, "completeness": N, "explanation": "..."&#125;&#125;"""
 
 async def llm_judge(question: str, answer: str, reference: str = "") -> dict:
     response = await client.chat.completions.create(
@@ -348,6 +353,7 @@ async def llm_judge(question: str, answer: str, reference: str = "") -> dict:
     )
     return json.loads(response.choices[0].message.content)
 ```
+:::
 
 ### 4.2 自动评分维度：相关性 / 忠实性 / 有害性
 
@@ -827,6 +833,7 @@ async def detect_injection(user_input: str) -> bool:
 
 ### 8.3 有害输出过滤
 
+::: v-pre
 ```python
 async def check_output_safety(output: str) -> dict:
     """检查模型输出是否安全"""
@@ -836,7 +843,7 @@ AI 回复：{output[:1000]}
 
 检查项：暴力、色情、歧视、违法建议、个人隐私泄露
 
-输出 JSON：{{"safe": true/false, "issues": ["问题1", ...]}}"""
+输出 JSON：&#123;&#123;"safe": true/false, "issues": ["问题1", ...]&#125;&#125;"""
     
     result = await client.chat.completions.create(
         model="gpt-4o-mini",
@@ -845,6 +852,7 @@ AI 回复：{output[:1000]}
     )
     return json.loads(result.choices[0].message.content)
 ```
+:::
 
 ### 8.4 审计日志与合规报告
 

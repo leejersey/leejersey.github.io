@@ -597,9 +597,9 @@ async def publish_outbox_events():
 
   事件溯源：数据库存事件序列，当前状态通过回放事件得出
     events 表:
-      {order_id:1, type:"created",  data:{amount:99.9}}
-      {order_id:1, type:"paid",     data:{payment_id:789}}
-      {order_id:1, type:"shipped",  data:{tracking:"SF123"}}
+      {order_id:1, type:"created",  data:{amount:99.9&#125;&#125;
+      {order_id:1, type:"paid",     data:{payment_id:789&#125;&#125;
+      {order_id:1, type:"shipped",  data:{tracking:"SF123"&#125;&#125;
     
     当前状态 = 回放所有事件：created → paid → shipped
 
@@ -896,6 +896,7 @@ Kafka 核心监控指标：
 
 ### 9.3 Prometheus 指标采集与告警
 
+::: v-pre
 ```yaml
 # RabbitMQ Prometheus 插件
 rabbitmq-plugins enable rabbitmq_prometheus
@@ -909,14 +910,15 @@ groups:
         expr: rabbitmq_queue_messages_ready > 10000
         for: 5m
         annotations:
-          summary: "队列 {{ $labels.queue }} 消息堆积 {{ $value }}"
+          summary: "队列 &#123;&#123; $labels.queue &#125;&#125; 消息堆积 &#123;&#123; $value &#125;&#125;"
       
       - alert: KafkaConsumerLag
         expr: kafka_consumer_group_lag > 50000
         for: 5m
         annotations:
-          summary: "消费组 {{ $labels.group }} 延迟 {{ $value }}"
+          summary: "消费组 &#123;&#123; $labels.group &#125;&#125; 延迟 &#123;&#123; $value &#125;&#125;"
 ```
+:::
 
 ### 9.4 容量规划与性能调优
 

@@ -346,6 +346,7 @@ docker run -d \
 
 ### 3.4 容器调试：exec、logs、inspect 三板斧
 
+::: v-pre
 ```bash
 # ── 1. exec：进入容器内部 ──
 docker exec -it my-app bash     # 进入容器的 shell
@@ -360,9 +361,10 @@ docker logs --since 1h my-app   # 最近 1 小时
 
 # ── 3. inspect：查看容器详情 ──
 docker inspect my-app           # 完整 JSON 信息
-docker inspect --format '{{.NetworkSettings.IPAddress}}' my-app  # 只看 IP
+docker inspect --format '&#123;&#123;.NetworkSettings.IPAddress&#125;&#125;' my-app  # 只看 IP
 docker stats                    # 实时资源使用（CPU/内存/网络）
 ```
+:::
 
 > 💡 **容器排错流程**：先 `docker logs` 看错误 → 再 `docker exec` 进去检查文件/配置 → 最后 `docker inspect` 看网络/挂载是否正确。
 
@@ -825,14 +827,17 @@ services:
       start_period: 40s        # 启动后等 40s 再开始检查
 ```
 
+::: v-pre
 ```bash
 # 查看健康状态
-docker inspect --format='{{.State.Health.Status}}' web
+docker inspect --format='&#123;&#123;.State.Health.Status&#125;&#125;' web
 # → healthy / unhealthy / starting
 ```
+:::
 
 ### 7.4 CI/CD 集成：GitHub Actions 自动构建部署
 
+::: v-pre
 ```yaml
 # .github/workflows/deploy.yml
 name: Build & Deploy
@@ -850,26 +855,27 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
+          username: $&#123;&#123; secrets.DOCKER_USERNAME &#125;&#125;
+          password: $&#123;&#123; secrets.DOCKER_TOKEN &#125;&#125;
 
       - name: Build and Push
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: username/my-app:${{ github.sha }}
+          tags: username/my-app:$&#123;&#123; github.sha &#125;&#125;
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_KEY }}
+          host: $&#123;&#123; secrets.SERVER_HOST &#125;&#125;
+          username: $&#123;&#123; secrets.SERVER_USER &#125;&#125;
+          key: $&#123;&#123; secrets.SSH_KEY &#125;&#125;
           script: |
             cd /opt/my-app
             docker compose pull
             docker compose up -d
 ```
+:::
 
 > 💡 **部署策略**：push 到 main → GitHub Actions 自动构建镜像 → 推送到仓库 → SSH 到服务器 → 拉取新镜像 → 重启服务。全程无需手动操作。
 
@@ -896,13 +902,15 @@ jobs:
 | `python:3.11-alpine` | ~50MB | apk | 有些包编译不过 |
 | `gcr.io/distroless/python3` | ~30MB | 无 | 极致安全 |
 
+::: v-pre
 ```bash
 # 查看镜像大小
-docker images --format "{{.Repository}}:{{.Tag}} {{.Size}}"
+docker images --format "&#123;&#123;.Repository&#125;&#125;:&#123;&#123;.Tag&#125;&#125; &#123;&#123;.Size&#125;&#125;"
 
 # 查看镜像每层大小（找出哪层最大）
 docker history my-app:latest
 ```
+:::
 
 ### 8.2 构建加速：BuildKit 与缓存挂载
 

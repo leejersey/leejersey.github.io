@@ -903,6 +903,7 @@ server {
 
 ### 7.3 GitHub Actions：自动化部署
 
+::: v-pre
 ```yaml
 # .github/workflows/deploy.yml
 name: Deploy
@@ -918,20 +919,21 @@ jobs:
       
       - name: Build & Push Docker Image
         run: |
-          docker build -t registry.example.com/ai-app:${{ github.sha }} .
-          docker push registry.example.com/ai-app:${{ github.sha }}
+          docker build -t registry.example.com/ai-app:$&#123;&#123; github.sha &#125;&#125; .
+          docker push registry.example.com/ai-app:$&#123;&#123; github.sha &#125;&#125;
       
       - name: Deploy to Server
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SERVER_HOST }}
+          host: $&#123;&#123; secrets.SERVER_HOST &#125;&#125;
           username: deploy
-          key: ${{ secrets.SSH_KEY }}
+          key: $&#123;&#123; secrets.SSH_KEY &#125;&#125;
           script: |
             cd /opt/ai-app
             docker compose pull
             docker compose up -d --force-recreate
 ```
+:::
 
 ### 7.4 健康检查与优雅关停
 

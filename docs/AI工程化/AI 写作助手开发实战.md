@@ -100,6 +100,7 @@ AI 写作助手的六大核心能力：
 
 ### 2.1 大纲生成的 Prompt 工程
 
+::: v-pre
 ```python
 OUTLINE_PROMPT = """你是一个专业的写作大纲设计师。根据用户提供的主题，生成一份结构清晰的文章大纲。
 
@@ -112,18 +113,18 @@ OUTLINE_PROMPT = """你是一个专业的写作大纲设计师。根据用户提
 
 ## 输出格式
 严格按 JSON 格式输出：
-{{
+&#123;&#123;
   "title": "文章标题",
   "summary": "一句话摘要",
   "chapters": [
-    {{
+    &#123;&#123;
       "title": "章节标题",
       "sections": [
-        {{"title": "小节标题", "key_points": ["要点1", "要点2"]}}
+        &#123;&#123;"title": "小节标题", "key_points": ["要点1", "要点2"]&#125;&#125;
       ]
-    }}
+    &#125;&#125;
   ]
-}}
+&#125;&#125;
 
 ## 主题
 {topic}
@@ -131,6 +132,7 @@ OUTLINE_PROMPT = """你是一个专业的写作大纲设计师。根据用户提
 ## 补充要求
 {extra_requirements}"""
 ```
+:::
 
 ```python
 class OutlineGenerator:
@@ -357,6 +359,7 @@ class ChapterWriter:
 
 ### 3.3 段落级生成与全文连贯性控制
 
+::: v-pre
 ```python
 class CoherenceController:
     """全文连贯性控制"""
@@ -391,11 +394,12 @@ class CoherenceController:
 {new_text[:500]}
 
 检查：语气是否一致？人称是否统一？术语是否前后一致？
-回复 JSON：{{"coherent": true/false, "issues": ["..."]}}"""
+回复 JSON：&#123;&#123;"coherent": true/false, "issues": ["..."]&#125;&#125;"""
         
         result = await self.llm.chat("deepseek", [{"role": "user", "content": prompt}])
         return json.loads(result.choices[0].message.content)
 ```
+:::
 
 ### 3.4 流式输出：打字机效果的实时体验
 
@@ -587,6 +591,7 @@ class Rewriter:
 
 ### 5.1 语法纠错引擎：规则 + LLM 混合方案
 
+::: v-pre
 ```python
 class GrammarChecker:
     """语法纠错引擎（规则 + LLM 混合）"""
@@ -616,11 +621,12 @@ class GrammarChecker:
 文本："{text}"
 
 以 JSON 数组返回每处修改建议：
-[{{"original": "原文", "corrected": "修正", "reason": "原因", "position": 字符位置}}]"""
+[&#123;&#123;"original": "原文", "corrected": "修正", "reason": "原因", "position": 字符位置&#125;&#125;]"""
         
         result = await self.llm.chat("deepseek", [{"role": "user", "content": prompt}])
         return json.loads(result.choices[0].message.content)
 ```
+:::
 
 ### 5.2 中文场景专项：错别字 / 标点 / 语序
 

@@ -188,10 +188,11 @@ jobs:
 
 ### 2.3 矩阵构建：多版本 / 多平台并行测试
 
+::: v-pre
 ```yaml
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: $&#123;&#123; matrix.os &#125;&#125;
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -202,12 +203,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: $&#123;&#123; matrix.python-version &#125;&#125;
       - run: python -m pytest
 ```
+:::
 
 ### 2.4 缓存依赖：pip / npm / docker 层缓存
 
+::: v-pre
 ```yaml
 # ── Python pip 缓存 ──
 - uses: actions/setup-python@v5
@@ -225,9 +228,10 @@ jobs:
 - uses: actions/cache@v4
   with:
     path: ~/.cache/pip
-    key: pip-${{ hashFiles('requirements.txt') }}
+    key: pip-$&#123;&#123; hashFiles('requirements.txt') &#125;&#125;
     restore-keys: pip-
 ```
+:::
 
 > 💡 **缓存的效果**：首次安装 `pip install` 需要 60 秒，缓存命中后只需 5 秒。矩阵构建 6 个组合 × 60 秒 = 6 分钟 → 缓存后 30 秒。
 
@@ -316,6 +320,7 @@ jobs:
 
 ### 3.3 测试覆盖率报告与 PR 评论
 
+::: v-pre
 ```yaml
       - name: Comment coverage on PR
         if: github.event_name == 'pull_request'
@@ -326,11 +331,12 @@ jobs:
             
             | 指标 | 数值 |
             |:---|:---|
-            | 覆盖率 | ${{ steps.coverage.outputs.total }}% |
-            | 测试用例 | ${{ steps.test.outputs.total }} 个 |
-            | 通过 | ✅ ${{ steps.test.outputs.passed }} |
-            | 失败 | ❌ ${{ steps.test.outputs.failed }} |
+            | 覆盖率 | $&#123;&#123; steps.coverage.outputs.total &#125;&#125;% |
+            | 测试用例 | $&#123;&#123; steps.test.outputs.total &#125;&#125; 个 |
+            | 通过 | ✅ $&#123;&#123; steps.test.outputs.passed &#125;&#125; |
+            | 失败 | ❌ $&#123;&#123; steps.test.outputs.failed &#125;&#125; |
 ```
+:::
 
 ### 3.4 分支保护：测试不过不许合并
 
@@ -366,6 +372,7 @@ jobs:
 
 ### 4.1 构建并推送到 Docker Hub
 
+::: v-pre
 ```yaml
 name: Build & Push Docker Image
 
@@ -382,8 +389,8 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
+          username: $&#123;&#123; secrets.DOCKER_USERNAME &#125;&#125;
+          password: $&#123;&#123; secrets.DOCKER_TOKEN &#125;&#125;
 
       - name: Build and Push
         uses: docker/build-push-action@v5
@@ -392,27 +399,30 @@ jobs:
           push: true
           tags: |
             username/my-app:latest
-            username/my-app:${{ github.sha }}
+            username/my-app:$&#123;&#123; github.sha &#125;&#125;
           cache-from: type=gha            # GitHub Actions 缓存
           cache-to: type=gha,mode=max
 ```
+:::
 
 ### 4.2 推送到 GitHub Container Registry（GHCR）
 
+::: v-pre
 ```yaml
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}  # 自动提供，无需配置
+          username: $&#123;&#123; github.actor &#125;&#125;
+          password: $&#123;&#123; secrets.GITHUB_TOKEN &#125;&#125;  # 自动提供，无需配置
 
       - name: Build and Push to GHCR
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+          tags: ghcr.io/$&#123;&#123; github.repository &#125;&#125;:latest
 ```
+:::
 
 > 💡 **GHCR 的优势**：`GITHUB_TOKEN` 自动提供，不需要额外配置 Secret。镜像跟代码在同一个地方管理。
 
@@ -442,6 +452,7 @@ jobs:
 | 语义化版本 | `my-app:v1.2.3` | 正式发布 |
 | 分支名 | `my-app:develop` | 多分支部署 |
 
+::: v-pre
 ```yaml
       - name: Docker meta
         id: meta
@@ -451,8 +462,9 @@ jobs:
           tags: |
             type=sha
             type=ref,event=branch
-            type=semver,pattern={{version}}
+            type=semver,pattern=&#123;&#123;version&#125;&#125;
 ```
+:::
 
 **第 4 章核心知识回顾：**
 
@@ -469,6 +481,7 @@ jobs:
 
 ### 5.1 SSH 部署：拉镜像 + docker compose up
 
+::: v-pre
 ```yaml
 name: Deploy
 
@@ -485,26 +498,28 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: $&#123;&#123; secrets.SERVER_HOST &#125;&#125;
+          username: $&#123;&#123; secrets.SERVER_USER &#125;&#125;
+          key: $&#123;&#123; secrets.SSH_PRIVATE_KEY &#125;&#125;
           script: |
             cd /opt/my-app
             docker compose pull
             docker compose up -d --remove-orphans
             docker image prune -f      # 清理旧镜像
 ```
+:::
 
 ### 5.2 部署到云平台：Vercel / Railway / Fly.io
 
+::: v-pre
 ```yaml
 # ── 部署到 Vercel（前端项目） ──
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-token: $&#123;&#123; secrets.VERCEL_TOKEN &#125;&#125;
+          vercel-org-id: $&#123;&#123; secrets.VERCEL_ORG_ID &#125;&#125;
+          vercel-project-id: $&#123;&#123; secrets.VERCEL_PROJECT_ID &#125;&#125;
           vercel-args: '--prod'
 
 # ── 部署到 Fly.io ──
@@ -512,8 +527,9 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_API_TOKEN: $&#123;&#123; secrets.FLY_API_TOKEN &#125;&#125;
 ```
+:::
 
 ### 5.3 零停机部署：蓝绿发布与滚动更新
 
@@ -533,6 +549,7 @@ script: |
 
 ### 5.4 多环境部署：staging → production 流水线
 
+::: v-pre
 ```yaml
 jobs:
   deploy-staging:
@@ -542,7 +559,7 @@ jobs:
       - name: Deploy to Staging
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.STAGING_HOST }}
+          host: $&#123;&#123; secrets.STAGING_HOST &#125;&#125;
           script: cd /opt/my-app && docker compose up -d
 
   deploy-production:
@@ -553,9 +570,10 @@ jobs:
       - name: Deploy to Production
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.PROD_HOST }}
+          host: $&#123;&#123; secrets.PROD_HOST &#125;&#125;
           script: cd /opt/my-app && docker compose up -d
 ```
+:::
 
 > 💡 **environment 审批**：在 GitHub → Settings → Environments → production 中设置 "Required reviewers"，部署到生产前需要指定人员点击 Approve。
 
@@ -591,24 +609,26 @@ Secrets 的两种级别：
 
 ### 6.2 环境变量与 .env 文件生成
 
+::: v-pre
 ```yaml
       - name: Create .env file
         run: |
           cat > .env << EOF
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
-          REDIS_URL=${{ secrets.REDIS_URL }}
-          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          DATABASE_URL=$&#123;&#123; secrets.DATABASE_URL &#125;&#125;
+          REDIS_URL=$&#123;&#123; secrets.REDIS_URL &#125;&#125;
+          SECRET_KEY=$&#123;&#123; secrets.SECRET_KEY &#125;&#125;
           DEBUG=false
           EOF
 
       - name: Deploy with .env
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SERVER_HOST }}
+          host: $&#123;&#123; secrets.SERVER_HOST &#125;&#125;
           script: |
             cd /opt/my-app
             docker compose --env-file .env up -d
 ```
+:::
 
 ### 6.3 OIDC 无密钥认证（AWS / GCP）
 
@@ -636,7 +656,7 @@ steps:
 | Secret 轮换 | 定期更新 Token 和密钥 |
 | 审计日志 | Settings → Log 查看 Secret 使用记录 |
 
-> 💡 **绝对不要**：在 Workflow 中 `echo ${{ secrets.XXX }}`——GitHub 会自动遮掩，但在某些边角情况下可能泄露。
+> 💡 **绝对不要**：在 Workflow 中 `echo $<span v-pre>&#123;&#123;  secrets.XXX  &#125;&#125;</span>`——GitHub 会自动遮掩，但在某些边角情况下可能泄露。
 
 **第 6 章核心知识回顾：**
 
@@ -653,6 +673,7 @@ steps:
 
 ### 7.1 前端项目：React/Vue → 构建 → 部署到 Vercel/Nginx
 
+::: v-pre
 ```yaml
 name: Frontend CI/CD
 
@@ -689,14 +710,16 @@ jobs:
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-token: $&#123;&#123; secrets.VERCEL_TOKEN &#125;&#125;
           vercel-args: '--prod'
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-org-id: $&#123;&#123; secrets.VERCEL_ORG_ID &#125;&#125;
+          vercel-project-id: $&#123;&#123; secrets.VERCEL_PROJECT_ID &#125;&#125;
 ```
+:::
 
 ### 7.2 Python 后端：FastAPI → Docker → 服务器
 
+::: v-pre
 ```yaml
 name: Backend CI/CD
 
@@ -731,29 +754,31 @@ jobs:
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: $&#123;&#123; github.actor &#125;&#125;
+          password: $&#123;&#123; secrets.GITHUB_TOKEN &#125;&#125;
 
       - uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          tags: ghcr.io/$&#123;&#123; github.repository &#125;&#125;:$&#123;&#123; github.sha &#125;&#125;
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: $&#123;&#123; secrets.SERVER_HOST &#125;&#125;
+          username: $&#123;&#123; secrets.SERVER_USER &#125;&#125;
+          key: $&#123;&#123; secrets.SSH_PRIVATE_KEY &#125;&#125;
           script: |
             cd /opt/my-api
             docker compose pull
             docker compose up -d
 ```
+:::
 
 ### 7.3 全栈项目：前端 + 后端 + 数据库迁移
 
+::: v-pre
 ```yaml
 name: Full Stack CI/CD
 
@@ -786,8 +811,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: $&#123;&#123; secrets.SERVER_HOST &#125;&#125;
+          key: $&#123;&#123; secrets.SSH_PRIVATE_KEY &#125;&#125;
           script: |
             cd /opt/fullstack-app
             git pull origin main
@@ -795,6 +820,7 @@ jobs:
             docker compose run --rm migrate alembic upgrade head
             docker compose up -d
 ```
+:::
 
 > 💡 **全栈项目的部署顺序**：先跑数据库迁移（`alembic upgrade head`），再重启应用容器。千万别反过来——新代码可能依赖新的数据库字段。
 
@@ -812,6 +838,7 @@ jobs:
 
 ### 8.1 可复用 Action 与 Composite Action
 
+::: v-pre
 ```yaml
 # .github/actions/setup-python-env/action.yml
 name: 'Setup Python Environment'
@@ -826,11 +853,12 @@ runs:
   steps:
     - uses: actions/setup-python@v5
       with:
-        python-version: ${{ inputs.python-version }}
+        python-version: $&#123;&#123; inputs.python-version &#125;&#125;
         cache: 'pip'
     - run: pip install -r requirements.txt
       shell: bash
 ```
+:::
 
 ```yaml
 # 在 Workflow 中使用
@@ -859,6 +887,7 @@ jobs:
 
 ### 8.3 Workflow 优化：并行、条件跳过、超时控制
 
+::: v-pre
 ```yaml
 # 跳过 CI（commit message 中包含 [skip ci]）
 on:
@@ -871,29 +900,32 @@ jobs:
 
 # 取消同分支的旧运行（节省资源）
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: $&#123;&#123; github.workflow &#125;&#125;-$&#123;&#123; github.ref &#125;&#125;
   cancel-in-progress: true
 ```
+:::
 
 ### 8.4 通知集成：Slack / 飞书 / 钉钉
 
+::: v-pre
 ```yaml
       - name: Notify on success
         if: success()
         uses: slackapi/slack-github-action@v1
         with:
           payload: |
-            {"text": "✅ 部署成功！${{ github.repository }} @ ${{ github.sha }}"}
+            {"text": "✅ 部署成功！$&#123;&#123; github.repository &#125;&#125; @ $&#123;&#123; github.sha &#125;&#125;"}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_URL: $&#123;&#123; secrets.SLACK_WEBHOOK &#125;&#125;
 
       - name: Notify on failure
         if: failure()
         run: |
-          curl -X POST ${{ secrets.FEISHU_WEBHOOK }} \
+          curl -X POST $&#123;&#123; secrets.FEISHU_WEBHOOK &#125;&#125; \
             -H 'Content-Type: application/json' \
-            -d '{"msg_type":"text","content":{"text":"❌ 部署失败！请检查 GitHub Actions"}}'
+            -d '{"msg_type":"text","content":{"text":"❌ 部署失败！请检查 GitHub Actions"&#125;&#125;'
 ```
+:::
 
 ---
 

@@ -773,6 +773,7 @@ npm publish --access public  # @scope 包必须加 --access public
 
 ### 7.2 GitHub Actions 自动发布
 
+::: v-pre
 ```yaml
 # .github/workflows/ci.yml
 name: CI
@@ -793,12 +794,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: $&#123;&#123; matrix.node-version &#125;&#125;
       - run: npm ci
       - run: npm run build
       - run: npm test
 ```
+:::
 
+::: v-pre
 ```yaml
 # .github/workflows/publish.yml
 name: Publish
@@ -807,7 +810,7 @@ on:
   push:
     branches: [main]
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency: $&#123;&#123; github.workflow &#125;&#125;-$&#123;&#123; github.ref &#125;&#125;
 
 jobs:
   release:
@@ -836,10 +839,11 @@ jobs:
           commit: 'chore: release'
           title: 'chore: release'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: $&#123;&#123; secrets.GITHUB_TOKEN &#125;&#125;
+          NPM_TOKEN: $&#123;&#123; secrets.NPM_TOKEN &#125;&#125;
+          NODE_AUTH_TOKEN: $&#123;&#123; secrets.NPM_TOKEN &#125;&#125;
 ```
+:::
 
 配置 NPM_TOKEN：
 

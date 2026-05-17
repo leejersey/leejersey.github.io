@@ -653,7 +653,7 @@ def describe_image(image_path: str, context: str = "") -> str:
                 {"type": "text", "text": prompt},
                 {"type": "image_url", "image_url": {
                     "url": f"data:image/png;base64,{image_data}"
-                }},
+                &#125;&#125;,
             ],
         }],
         max_tokens=500,
@@ -1644,6 +1644,7 @@ results = retrieve_with_multi_query(
   根据分数决定是否使用检索结果
 ```
 
+::: v-pre
 ```python
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
@@ -1666,7 +1667,7 @@ router_prompt = ChatPromptTemplate.from_messages([
 我们的知识库包含：公司规章制度、产品使用文档、技术架构方案、FAQ。
 
 返回 JSON 格式：
-{{"route": "rag/database/direct", "confidence": 0.9, "reason": "简短原因"}}"""),
+&#123;&#123;"route": "rag/database/direct", "confidence": 0.9, "reason": "简短原因"&#125;&#125;"""),
     ("human", "{query}"),
 ])
 
@@ -1712,6 +1713,7 @@ class QueryProcessor:
             "retrieved_docs": docs,
         }
 ```
+:::
 
 **路由决策速查表：**
 
@@ -1831,7 +1833,7 @@ def hybrid_search(query: str, collection: Collection,
     dense_req = AnnSearchRequest(
         data=query_emb["dense"],
         anns_field="dense_embedding",
-        param={"metric_type": "COSINE", "params": {"ef": 128}},
+        param={"metric_type": "COSINE", "params": {"ef": 128&#125;&#125;,
         limit=20,
         expr=filter_expr,  # 结构化过滤条件
     )
@@ -1840,7 +1842,7 @@ def hybrid_search(query: str, collection: Collection,
     sparse_req = AnnSearchRequest(
         data=query_emb["sparse"],
         anns_field="sparse_embedding",
-        param={"metric_type": "IP", "params": {}},
+        param={"metric_type": "IP", "params": {&#125;&#125;,
         limit=20,
         expr=filter_expr,
     )

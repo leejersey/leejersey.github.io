@@ -104,6 +104,7 @@ AI 数据分析助手的核心价值——让不会写 SQL 的人也能分析数
 
 ### 2.1 Text-to-SQL 的 Prompt 工程
 
+::: v-pre
 ```python
 TEXT2SQL_PROMPT = """你是一个 SQL 专家。根据用户问题和数据库 Schema 生成 SQL 查询。
 
@@ -122,7 +123,7 @@ TEXT2SQL_PROMPT = """你是一个 SQL 专家。根据用户问题和数据库 Sc
 3. 时间字段的格式：{date_format}
 4. 使用中文别名让结果易读（AS "销售额"）
 5. 大表查询必须加 LIMIT（默认 1000）
-6. 如果问题不明确，返回 JSON：{{"unclear": true, "clarification": "需要澄清的问题"}}
+6. 如果问题不明确，返回 JSON：&#123;&#123;"unclear": true, "clarification": "需要澄清的问题"&#125;&#125;
 
 ## 用户问题
 {question}
@@ -150,6 +151,7 @@ class Text2SQL:
         
         return {"sql": sql, "tokens": result.usage.total_tokens}
 ```
+:::
 
 ### 2.2 数据库 Schema 自动发现与注入
 
@@ -567,7 +569,7 @@ class ChartGenerator:
         code = code.replace("```python", "").replace("```", "").strip()
         
         # 安全执行
-        exec(code, {"__builtins__": {}}, {
+        exec(code, {"__builtins__": {&#125;&#125;, {
             "plt": __import__("matplotlib.pyplot"),
             "json": json, "data": data,
         })
@@ -577,6 +579,7 @@ class ChartGenerator:
 
 ### 4.3 图表美化：配色 / 标注 / 响应式
 
+::: v-pre
 ```python
 # ── 预设配色方案 ──
 COLOR_SCHEMES = {
@@ -594,7 +597,7 @@ plt.rcParams['font.sans-serif'] = ['SimHei']
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.bar(x_data, y_data, color=colors)
 for i, v in enumerate(y_data):
-    ax.text(i, v + max(y_data)*0.02, f'{{v:,.0f}}', ha='center')
+    ax.text(i, v + max(y_data)*0.02, f'&#123;&#123;v:,.0f&#125;&#125;', ha='center')
 ax.set_title(title)
 ax.set_xlabel(x_label)
 ax.set_ylabel(y_label)
@@ -602,6 +605,7 @@ plt.tight_layout()
 plt.savefig(output_path, dpi=150)""",
 }
 ```
+:::
 
 ### 4.4 前端集成：从后端图片到前端交互式图表
 
@@ -625,7 +629,7 @@ class EChartsGenerator:
                 "xAxis": {"type": "category", "data": x_data},
                 "yAxis": {"type": "value"},
                 "series": [{"type": "bar", "data": y_data,
-                            "itemStyle": {"color": "#3B82F6"}}],
+                            "itemStyle": {"color": "#3B82F6"&#125;&#125;],
             }
         elif chart_type == "line":
             return {
@@ -898,6 +902,7 @@ class ConversationContext:
 
 ### 6.3 意图识别：查询 / 可视化 / 洞察 / 导出
 
+::: v-pre
 ```python
 class IntentClassifier:
     """意图分类器"""
@@ -917,7 +922,7 @@ class IntentClassifier:
 
 用户问题：{question}
 
-回复 JSON：{{"intent": "类型", "references_previous": true/false}}"""
+回复 JSON：&#123;&#123;"intent": "类型", "references_previous": true/false&#125;&#125;"""
 
     async def classify(self, question: str, context: str) -> dict:
         prompt = self.INTENT_PROMPT.format(question=question, context=context)
@@ -926,9 +931,11 @@ class IntentClassifier:
         ], temperature=0)
         return json.loads(result.choices[0].message.content)
 ```
+:::
 
 ### 6.4 模糊查询处理：用户说不清楚怎么办
 
+::: v-pre
 ```python
 class ClarificationHandler:
     """模糊查询澄清"""
@@ -941,7 +948,7 @@ class ClarificationHandler:
 用户问题：{question}
 
 回复 JSON：
-{{
+&#123;&#123;
   "needs_clarification": true/false,
   "clarification_questions": [
     "你想看哪个时间范围的数据？",
@@ -952,7 +959,7 @@ class ClarificationHandler:
     "默认 GMV = 实际支付金额"
   ],
   "can_proceed_with_defaults": true/false
-}}"""
+&#125;&#125;"""
         
         result = await self.llm.chat("deepseek", [
             {"role": "user", "content": prompt}
@@ -960,6 +967,7 @@ class ClarificationHandler:
         
         return json.loads(result.choices[0].message.content)
 ```
+:::
 
 **第 6 章核心知识回顾：**
 

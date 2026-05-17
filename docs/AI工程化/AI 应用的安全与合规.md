@@ -179,6 +179,7 @@ class InputIsolator:
 
 ### 2.4 防御层 2：Guardrail LLM 语义检测
 
+::: v-pre
 ```python
 class GuardrailLLM:
     """用轻量级 LLM 做安全守门员"""
@@ -192,7 +193,7 @@ class GuardrailLLM:
 用户输入：
 <input>{user_input}</input>
 
-只回复 JSON：{{"safe": true/false, "reason": "原因", "risk_level": "low/medium/high"}}"""
+只回复 JSON：&#123;&#123;"safe": true/false, "reason": "原因", "risk_level": "low/medium/high"&#125;&#125;"""
 
     async def check(self, user_input: str) -> dict:
         """检测输入是否安全"""
@@ -210,6 +211,7 @@ class GuardrailLLM:
         
         return result
 ```
+:::
 
 ### 2.5 防御层 3：输出验证与行为约束
 
@@ -525,6 +527,7 @@ class OutputSecurityPipeline:
 
 ### 4.2 有害内容检测：暴力 / 歧视 / 违法信息
 
+::: v-pre
 ```python
 class HarmDetector:
     """有害内容检测（多策略）"""
@@ -547,7 +550,7 @@ class HarmDetector:
     async def semantic_check(self, text: str) -> dict:
         prompt = f"""判断以下文本是否包含有害内容（暴力/违法/歧视/色情）。
 文本："{text[:500]}"
-回复 JSON：{{"harmful": true/false, "category": "类别", "confidence": 0.0-1.0}}"""
+回复 JSON：&#123;&#123;"harmful": true/false, "category": "类别", "confidence": 0.0-1.0&#125;&#125;"""
         
         result = await self.llm.chat("deepseek", [{"role": "user", "content": prompt}])
         return json.loads(result.choices[0].message.content)
@@ -558,6 +561,7 @@ class HarmDetector:
         # 返回标准化的检测结果
         pass
 ```
+:::
 
 > 💡 **三策略组合最佳**——关键词做初筛（<1ms）、LLM 做精筛（~500ms）、第三方 API 做合规兜底。按成本和延迟分层，不是每条输出都需要跑全部策略。
 
@@ -601,6 +605,7 @@ class LeakageDetector:
 
 ### 4.4 幻觉检测与事实核验
 
+::: v-pre
 ```python
 class HallucinationDetector:
     """幻觉检测：检查模型输出是否有事实依据"""
@@ -616,7 +621,7 @@ class HallucinationDetector:
 {output}
 
 回复 JSON：
-{{"has_hallucination": true/false, "unsupported_claims": ["...",], "confidence": 0.0-1.0}}"""
+&#123;&#123;"has_hallucination": true/false, "unsupported_claims": ["...",], "confidence": 0.0-1.0&#125;&#125;"""
         
         result = await self.llm.chat("deepseek", [{"role": "user", "content": prompt}])
         return json.loads(result.choices[0].message.content)
@@ -636,6 +641,7 @@ class HallucinationDetector:
             "warning": "模型对此问题不确定" if consistency < 0.7 else None,
         }
 ```
+:::
 
 **第 4 章核心知识回顾：**
 
@@ -837,6 +843,7 @@ class DocumentAnonymizer:
 
 ### 6.2 文本审核方案：关键词 + LLM + 第三方 API
 
+::: v-pre
 ```python
 class ContentModerator:
     """内容审核（三级策略）"""
@@ -869,11 +876,12 @@ class ContentModerator:
 5. 侵犯隐私
 
 文本："{text[:1000]}"
-回复 JSON：{{"risk_level": "low/medium/high", "categories": [], "reason": ""}}"""
+回复 JSON：&#123;&#123;"risk_level": "low/medium/high", "categories": [], "reason": ""&#125;&#125;"""
         
         result = await self.llm.chat("deepseek", [{"role": "user", "content": prompt}])
         return json.loads(result.choices[0].message.content)
 ```
+:::
 
 ### 6.3 多模态审核：图片 / 音频 / 视频
 

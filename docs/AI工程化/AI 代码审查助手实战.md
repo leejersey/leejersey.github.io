@@ -1334,6 +1334,7 @@ asyncio.run(main())
 
 把 AI Review 做成可复用的 GitHub Action：
 
+::: v-pre
 ```yaml
 # .github/workflows/ai-review.yml
 name: AI Code Review
@@ -1363,19 +1364,20 @@ jobs:
 
       - name: Get PR diff
         run: |
-          git diff ${{ github.event.pull_request.base.sha }}...\
-                   ${{ github.event.pull_request.head.sha }} > pr.diff
+          git diff $&#123;&#123; github.event.pull_request.base.sha &#125;&#125;...\
+                   $&#123;&#123; github.event.pull_request.head.sha &#125;&#125; > pr.diff
 
       - name: Run AI Review
         env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEEPSEEK_API_KEY: $&#123;&#123; secrets.DEEPSEEK_API_KEY &#125;&#125;
+          GITHUB_TOKEN: $&#123;&#123; secrets.GITHUB_TOKEN &#125;&#125;
         run: |
           python scripts/ci_review.py \
             --diff-file pr.diff \
-            --repo ${{ github.repository }} \
-            --pr ${{ github.event.pull_request.number }}
+            --repo $&#123;&#123; github.repository &#125;&#125; \
+            --pr $&#123;&#123; github.event.pull_request.number &#125;&#125;
 ```
+:::
 
 ```
 三种集成方式对比：

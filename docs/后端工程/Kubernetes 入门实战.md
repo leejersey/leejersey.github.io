@@ -1500,30 +1500,32 @@ database:
   port: 5432
 ```
 
-**模板示例（用 `{{ .Values.xxx }}` 引用参数）：**
+**模板示例（用 `<span v-pre>&#123;&#123;  .Values.xxx  &#125;&#125;</span>` 引用参数）：**
 
+::: v-pre
 ```yaml
 # templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-web    # Release 名称 + 后缀
+  name: &#123;&#123; .Release.Name &#125;&#125;-web    # Release 名称 + 后缀
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: &#123;&#123; .Values.replicaCount &#125;&#125;
   selector:
     matchLabels:
-      app: {{ .Release.Name }}
+      app: &#123;&#123; .Release.Name &#125;&#125;
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}
+        app: &#123;&#123; .Release.Name &#125;&#125;
     spec:
       containers:
         - name: web
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "&#123;&#123; .Values.image.repository &#125;&#125;:&#123;&#123; .Values.image.tag &#125;&#125;"
           ports:
             - containerPort: 8000
 ```
+:::
 
 **多环境部署：**
 

@@ -557,6 +557,7 @@ async def search_similar(db: AsyncSession, query_vec: list[float],
 
 **方案二：Redis VSS（极低延迟场景）**
 
+::: v-pre
 ```python
 import redis.asyncio as redis
 from redis.commands.search.query import Query
@@ -583,7 +584,7 @@ async def search_redis_vss(r: redis.Redis, query_vec: list[float],
     """在 Redis VSS 中搜索"""
     import numpy as np
     
-    q = (Query(f"(@model:{{{model}}})=>[KNN 1 @embedding $vec AS score]")
+    q = (Query(f"(@model:&#123;&#123;{model&#125;&#125;})=>[KNN 1 @embedding $vec AS score]")
          .return_fields("prompt", "response", "score")
          .dialect(2))
     
@@ -599,6 +600,7 @@ async def search_redis_vss(r: redis.Redis, query_vec: list[float],
                     "similarity": similarity}
     return None
 ```
+:::
 
 > 💡 **起步用 pgvector，后期按需迁移**——如果你的应用已经用了 PostgreSQL，pgvector 是零成本的最佳起步方案。100 万条缓存以内，pgvector + HNSW 索引的查询延迟可以稳定在 10ms 以内。
 ### 3.4 相似度阈值调优：精确率 vs 召回率的平衡

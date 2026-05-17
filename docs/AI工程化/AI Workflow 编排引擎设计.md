@@ -104,6 +104,7 @@ Workflow 引擎的四个核心概念：
 
 ### 2.1 节点类型设计：LLM / 代码 / 条件 / HTTP / 人工审核
 
+::: v-pre
 ```python
 from pydantic import BaseModel, Field
 from enum import Enum
@@ -127,11 +128,12 @@ class NodeConfig(BaseModel):
     config: dict[str, Any] = Field(default={}, description="节点特定配置")
     
     # LLM 节点示例 config:
-    # {"model": "gpt-4o", "prompt": "请总结：{{input}}", "temperature": 0.7}
+    # {"model": "gpt-4o", "prompt": "请总结：&#123;&#123;input&#125;&#125;", "temperature": 0.7}
     
     # 条件节点示例 config:
-    # {"condition": "{{score}} > 0.8", "true_next": "node_3", "false_next": "node_4"}
+    # {"condition": "&#123;&#123;score&#125;&#125; > 0.8", "true_next": "node_3", "false_next": "node_4"}
 ```
+:::
 
 ### 2.2 边与连接：数据如何在节点间流动
 
@@ -154,6 +156,7 @@ class WorkflowDefinition(BaseModel):
 
 ### 2.3 工作流定义格式：JSON Schema 设计
 
+::: v-pre
 ```json
 {
   "id": "content_pipeline",
@@ -162,15 +165,15 @@ class WorkflowDefinition(BaseModel):
     {"id": "start", "type": "start", "name": "开始"},
     {"id": "outline", "type": "llm", "name": "生成大纲", "config": {
       "model": "gpt-4o",
-      "prompt": "为主题「{{topic}}」生成文章大纲"
-    }},
+      "prompt": "为主题「&#123;&#123;topic&#125;&#125;」生成文章大纲"
+    &#125;&#125;,
     {"id": "draft", "type": "llm", "name": "撰写初稿", "config": {
       "model": "gpt-4o",
-      "prompt": "根据大纲撰写文章：\n{{outline.output}}"
-    }},
+      "prompt": "根据大纲撰写文章：\n&#123;&#123;outline.output&#125;&#125;"
+    &#125;&#125;,
     {"id": "review", "type": "human", "name": "人工审核", "config": {
       "message": "请审核初稿质量"
-    }},
+    &#125;&#125;,
     {"id": "end", "type": "end", "name": "结束"}
   ],
   "edges": [
@@ -182,17 +185,19 @@ class WorkflowDefinition(BaseModel):
   "variables": {"topic": ""}
 }
 ```
+:::
 
 ### 2.4 变量系统：模板变量与数据引用
 
+::: v-pre
 ```python
 import re
 
 class VariableResolver:
-    """变量解析器：支持 {{node_id.output}} 语法"""
+    """变量解析器：支持 &#123;&#123;node_id.output&#125;&#125; 语法"""
     
     def __init__(self, context: dict[str, Any]):
-        self.context = context  # {"node_id": {"output": "...", "status": "..."}}
+        self.context = context  # {"node_id": {"output": "...", "status": "..."&#125;&#125;
     
     def resolve(self, template: str) -> str:
         """解析模板中的变量引用"""
@@ -203,7 +208,7 @@ class VariableResolver:
             value = self.context
             for key in path:
                 if isinstance(value, dict):
-                    value = value.get(key, f"{{{{UNDEFINED:{match.group(1)}}}}}")
+                    value = value.get(key, f"&#123;&#123;&#123;&#123;UNDEFINED:{match.group(1)&#125;&#125;&#125;&#125;}")
                 else:
                     return str(value)
             return str(value)
@@ -215,11 +220,12 @@ resolver = VariableResolver({
     "topic": "Python 异步编程",
     "outline": {"output": "1. 协程基础\n2. asyncio\n3. 实战"},
 })
-result = resolver.resolve("根据大纲撰写文章：\n{{outline.output}}")
+result = resolver.resolve("根据大纲撰写文章：\n&#123;&#123;outline.output&#125;&#125;")
 # → "根据大纲撰写文章：\n1. 协程基础\n2. asyncio\n3. 实战"
 ```
+:::
 
-> 💡 **变量系统是 Workflow 引擎的"血管"**——节点间的数据传递全靠它。`{{node_id.output}}` 语法让非开发者也能理解数据流向。
+> 💡 **变量系统是 Workflow 引擎的"血管"**——节点间的数据传递全靠它。`<span v-pre>&#123;&#123; node_id.output &#125;&#125;</span>` 语法让非开发者也能理解数据流向。
 
 **第 2 章核心知识回顾：**
 
@@ -228,7 +234,7 @@ result = resolver.resolve("根据大纲撰写文章：\n{{outline.output}}")
 | **NodeConfig** | 节点定义：ID + 类型 + 配置 |
 | **Edge** | 边：source → target，可带条件 |
 | **WorkflowDefinition** | 节点列表 + 边列表 + 全局变量 |
-| **变量引用** | `{{node_id.output}}` 引用其他节点的输出 |
+| **变量引用** | `<span v-pre>&#123;&#123; node_id.output &#125;&#125;</span>` 引用其他节点的输出 |
 
 ---
 
@@ -470,7 +476,7 @@ async def execute_code_node(config: dict, context: dict) -> Any:
     
     # 构建安全的执行环境
     safe_globals = {"__builtins__": {k: __builtins__[k] for k in SAFE_BUILTINS
-                                     if k in __builtins__}}
+                                     if k in __builtins__&#125;&#125;
     safe_globals["context"] = context
     safe_globals["json"] = __import__("json")
     
@@ -485,14 +491,15 @@ async def execute_code_node(config: dict, context: dict) -> Any:
 
 ### 4.3 条件节点：if/else 分支路由
 
+::: v-pre
 ```python
 async def execute_condition_node(config: dict, context: dict) -> dict:
     """条件节点：计算条件表达式，决定走哪条分支"""
-    condition = config["condition"]    # 如 "{{score}} > 0.8"
+    condition = config["condition"]    # 如 "&#123;&#123;score&#125;&#125; > 0.8"
     
     # 安全求值
     try:
-        result = eval(condition, {"__builtins__": {}}, context)
+        result = eval(condition, {"__builtins__": {&#125;&#125;, context)
     except Exception:
         result = False
     
@@ -502,6 +509,7 @@ async def execute_condition_node(config: dict, context: dict) -> dict:
         "next_node": config.get("true_next" if result else "false_next"),
     }
 ```
+:::
 
 ### 4.4 HTTP 节点：调用外部 API
 
@@ -532,6 +540,7 @@ async def execute_http_node(config: dict, context: dict) -> dict:
 
 ### 4.5 循环节点：批量处理列表数据
 
+::: v-pre
 ```python
 async def execute_loop_node(config: dict, context: dict) -> list:
     """循环节点：对列表中的每个元素执行子工作流"""
@@ -549,12 +558,13 @@ async def execute_loop_node(config: dict, context: dict) -> list:
         async with semaphore:
             sub_context = {**context, "item": item}
             executor = NODE_EXECUTORS[NodeType.LLM]
-            return await executor({"prompt": config["prompt"].replace("{{item}}", str(item))}, sub_context)
+            return await executor({"prompt": config["prompt"].replace("&#123;&#123;item&#125;&#125;", str(item))}, sub_context)
     
     tasks = [process_one(item) for item in items]
     results = await asyncio.gather(*tasks)
     return list(results)
 ```
+:::
 
 ```python
 # 注册所有节点执行器
@@ -865,6 +875,7 @@ async def update_workflow(workflow_id: UUID, req: WorkflowDefinition):
 
 ### 7.1 内容生成流水线：大纲 → 初稿 → 审核 → 发布
 
+::: v-pre
 ```json
 {
   "id": "content_pipeline",
@@ -873,27 +884,27 @@ async def update_workflow(workflow_id: UUID, req: WorkflowDefinition):
     {"id": "start", "type": "start", "name": "开始"},
     {"id": "outline", "type": "llm", "name": "生成大纲", "config": {
       "model": "gpt-4o",
-      "prompt": "为主题「{{topic}}」生成一篇 3000 字文章的大纲，包含 5-7 个章节"
-    }},
+      "prompt": "为主题「&#123;&#123;topic&#125;&#125;」生成一篇 3000 字文章的大纲，包含 5-7 个章节"
+    &#125;&#125;,
     {"id": "draft", "type": "llm", "name": "撰写初稿", "config": {
       "model": "gpt-4o",
-      "prompt": "根据以下大纲撰写完整文章：\n\n{{outline.output}}\n\n要求：专业、有深度、带代码示例"
-    }},
+      "prompt": "根据以下大纲撰写完整文章：\n\n&#123;&#123;outline.output&#125;&#125;\n\n要求：专业、有深度、带代码示例"
+    &#125;&#125;,
     {"id": "quality_check", "type": "llm", "name": "质量检查", "config": {
       "model": "gpt-4o-mini",
-      "prompt": "评估以下文章的质量（1-10 分），指出问题：\n\n{{draft.output}}"
-    }},
+      "prompt": "评估以下文章的质量（1-10 分），指出问题：\n\n&#123;&#123;draft.output&#125;&#125;"
+    &#125;&#125;,
     {"id": "score_check", "type": "condition", "name": "分数检查", "config": {
       "condition": "int(quality_check['output'].split('分')[0][-1]) >= 7",
       "true_next": "review",
       "false_next": "rewrite"
-    }},
+    &#125;&#125;,
     {"id": "rewrite", "type": "llm", "name": "重写", "config": {
-      "prompt": "根据反馈修改文章：\n\n反馈：{{quality_check.output}}\n\n原文：{{draft.output}}"
-    }},
+      "prompt": "根据反馈修改文章：\n\n反馈：&#123;&#123;quality_check.output&#125;&#125;\n\n原文：&#123;&#123;draft.output&#125;&#125;"
+    &#125;&#125;,
     {"id": "review", "type": "human", "name": "人工审核", "config": {
       "message": "请审核以下文章是否可以发布"
-    }},
+    &#125;&#125;,
     {"id": "end", "type": "end", "name": "结束"}
   ],
   "edges": [
@@ -908,9 +919,11 @@ async def update_workflow(workflow_id: UUID, req: WorkflowDefinition):
   ]
 }
 ```
+:::
 
 ### 7.2 智能客服流程：意图识别 → 路由 → 回复
 
+::: v-pre
 ```json
 {
   "id": "customer_service",
@@ -919,31 +932,33 @@ async def update_workflow(workflow_id: UUID, req: WorkflowDefinition):
     {"id": "start", "type": "start", "name": "开始"},
     {"id": "intent", "type": "llm", "name": "意图识别", "config": {
       "model": "gpt-4o-mini",
-      "prompt": "识别用户意图，输出类别：product_inquiry / complaint / refund / other\n\n用户消息：{{message}}"
-    }},
+      "prompt": "识别用户意图，输出类别：product_inquiry / complaint / refund / other\n\n用户消息：&#123;&#123;message&#125;&#125;"
+    &#125;&#125;,
     {"id": "route", "type": "condition", "name": "路由", "config": {
       "condition": "'refund' in intent['output'] or 'complaint' in intent['output']",
       "true_next": "human_agent",
       "false_next": "kb_search"
-    }},
+    &#125;&#125;,
     {"id": "kb_search", "type": "http", "name": "知识库搜索", "config": {
       "url": "http://localhost:8000/api/search",
       "method": "POST",
-      "body": {"query": "{{message}}", "top_k": 3}
-    }},
+      "body": {"query": "&#123;&#123;message&#125;&#125;", "top_k": 3}
+    &#125;&#125;,
     {"id": "answer", "type": "llm", "name": "生成回复", "config": {
-      "prompt": "基于知识库结果回答用户：\n\n知识库：{{kb_search.output}}\n\n用户问题：{{message}}"
-    }},
+      "prompt": "基于知识库结果回答用户：\n\n知识库：&#123;&#123;kb_search.output&#125;&#125;\n\n用户问题：&#123;&#123;message&#125;&#125;"
+    &#125;&#125;,
     {"id": "human_agent", "type": "human", "name": "转人工", "config": {
       "message": "用户需要退款/投诉处理，请人工介入"
-    }},
+    &#125;&#125;,
     {"id": "end", "type": "end", "name": "结束"}
   ]
 }
 ```
+:::
 
 ### 7.3 数据处理管道：采集 → 清洗 → 分析 → 报告
 
+::: v-pre
 ```json
 {
   "id": "data_pipeline",
@@ -951,25 +966,26 @@ async def update_workflow(workflow_id: UUID, req: WorkflowDefinition):
   "nodes": [
     {"id": "start", "type": "start", "name": "开始"},
     {"id": "fetch", "type": "http", "name": "获取数据", "config": {
-      "url": "{{api_url}}",
+      "url": "&#123;&#123;api_url&#125;&#125;",
       "method": "GET"
-    }},
+    &#125;&#125;,
     {"id": "clean", "type": "code", "name": "数据清洗", "config": {
       "code": "data = context['fetch']['output']['body']\nresult = [item for item in data if item.get('status') == 'active']"
-    }},
+    &#125;&#125;,
     {"id": "analyze", "type": "loop", "name": "逐条分析", "config": {
       "items": "clean",
-      "prompt": "分析以下数据，提取关键指标：{{item}}",
+      "prompt": "分析以下数据，提取关键指标：&#123;&#123;item&#125;&#125;",
       "concurrency": 5
-    }},
+    &#125;&#125;,
     {"id": "report", "type": "llm", "name": "生成报告", "config": {
       "model": "gpt-4o",
-      "prompt": "基于以下分析结果，生成一份完整的数据分析报告：\n\n{{analyze.output}}"
-    }},
+      "prompt": "基于以下分析结果，生成一份完整的数据分析报告：\n\n&#123;&#123;analyze.output&#125;&#125;"
+    &#125;&#125;,
     {"id": "end", "type": "end", "name": "结束"}
   ]
 }
 ```
+:::
 
 > 💡 **三个实战覆盖了最常见的 Workflow 模式**——顺序+条件分支（内容生成）、意图路由（客服）、循环+并行（数据处理）。理解这三个模式，就能组合出绝大多数 AI 工作流。
 
@@ -1106,7 +1122,7 @@ async def create_from_template(template_id: str, customization: dict = {}):
   "name": "工作流模板",
   "nodes": [
     {"id": "start", "type": "start", "name": "开始"},
-    {"id": "node_1", "type": "llm", "name": "处理", "config": {"prompt": "..."}},
+    {"id": "node_1", "type": "llm", "name": "处理", "config": {"prompt": "..."&#125;&#125;,
     {"id": "end", "type": "end", "name": "结束"}
   ],
   "edges": [
